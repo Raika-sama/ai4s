@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const Result = require('../models/Result');
+const Result = require('../models/Results');
 const authMiddleware = require('../middleware/authMiddleware');
 const { spawn } = require('child_process'); // Importa la funzione spawn
 

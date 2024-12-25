@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const Test = require('../models/Test'); // Importa il modello Test
+const Test = require('../models/Tests'); // Importa il modello Test
 const authMiddleware = require('../middleware/authMiddleware'); // Importa il middleware di autenticazione
 
 // API per ottenere la lista dei test disponibili

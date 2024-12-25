@@ -2,7 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
+const User = require('../models/Users');
 const authMiddleware = require('../middleware/authMiddleware'); // Importa il middleware di autenticazione
 
 // API per ottenere i dati dell'utente autenticato
