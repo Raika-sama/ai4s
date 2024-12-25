@@ -66,13 +66,17 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Credenziali non valide.' });
     }
 
-    const token = jwt.sign({ userId: user._id }, secretKey);
-    return res.json({ token });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Errore durante il login.' });
-    }
-  });
+    const token = jwt.sign(
+      { 
+          userId: user._id,
+          email: user.email,
+          ruolo: user.ruolo 
+      }, 
+      secretKey,
+      { 
+          expiresIn: '24h' // Token expires in 24 hours
+      }
+  );
   router.get('/users/me', authenticateJWT, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);

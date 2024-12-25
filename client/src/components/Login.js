@@ -1,46 +1,58 @@
-// src/components/Login.js
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
 
     try {
-      const response = await fetch('localhost:5000/api/auth/login', { // Invia la richiesta all'API /login
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ email, password })
       });
 
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem('token', data.token);
-          navigate('/dashboard');
-        
+      const data = await response.json();
       
-        // Salva il token JWT (es. in localStorage)
-        localStorage.setItem('token', token);
-
-        // TODO: Reindirizza l'utente alla pagina protetta
-        console.log('Login avvenuto con successo!');
+      if (response.ok) {
+        // Salva il token JWT
+        localStorage.setItem('token', data.token);
+        
+        // Se "Ricordami" è selezionato, salva anche l'email
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
         } else {
-        // Errore durante il login
-        const errorData = await response.json();
-        setError(errorData.message || 'Errore durante il login.');
+          localStorage.removeItem('rememberedEmail');
         }
-      } 
-      catch (error) {
+        
+        // Reindirizza l'utente alla dashboard
+        navigate('/dashboard');
+      } else {
+        setError(data.message || 'Errore durante il login.');
+      }
+    } catch (error) {
       console.error('Errore di rete:', error);
-      setError('Errore di rete. Riprova più tardi.');
+      setError('Errore di connessione al server. Riprova più tardi.');
     }
   };
+
+  // Carica l'email salvata se presente
+  React.useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -76,18 +88,8 @@ function Login() {
         <label htmlFor="rememberMe">Ricordami</label>
       </div>
       <button type="submit">Login</button>
-      {/* TODO: Link per il recupero password */}
-      {/* <a href="/recupero-password">Password dimenticata?</a> */} 
     </form>
   );
 }
 
 export default Login;
-
-
-// Gestisce l'invio del form di login.
-// Invia una richiesta POST all'API /login con email e password.
-// Se il login ha successo, salva il token JWT in localStorage.
-// Gestisce gli errori di login e di rete.
-// Ho incluso la gestione degli errori e la memorizzazione del token JWT in localStorage.
-// Il codice per reindirizzare l'utente alla pagina protetta e per il recupero password è ancora da implementare (// TODO: ...).

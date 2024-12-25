@@ -12,6 +12,11 @@ const userRoutes = require('./routes/userRoutes');
 const testRoutes = require('./routes/testRoutes');
 const resultRoutes = require('./routes/resultRoutes');
 
+app.use(cors({
+  origin: 'http://localhost:3000', // L'URL del tuo frontend React
+  credentials: true
+}));
+
 // Middleware per il parsing del body delle richieste
 app.use(express.json()); 
 
@@ -31,7 +36,6 @@ mongoose.connect(uri, {
 });
 
 
-app.use(cors()); // Aggiungi il middleware CORS
 
 // Routes
 app.use('/api/auth', authRoutes);

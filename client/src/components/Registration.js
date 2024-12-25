@@ -33,8 +33,9 @@ function Registration() {
       const data = await response.json();
       
       if (response.ok) {
-        console.log('Registrazione completata:', data);
-        // Handle successful registration
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        navigate('/dashboard');
       } else {
         setError(data.message);
       }
