@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 const port = process.env.PORT || 5000;
+const cors = require('cors');
 
 // Importa le routes
 const authRoutes = require('./routes/authRoutes');
@@ -29,11 +30,16 @@ mongoose.connect(uri, {
   console.error('Errore di connessione a MongoDB:', err);
 });
 
+
+app.use(cors()); // Aggiungi il middleware CORS
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tests', testRoutes);
 app.use('/api/results', resultRoutes);
+
+
 
 // Avvio del server
 app.listen(port, () => {

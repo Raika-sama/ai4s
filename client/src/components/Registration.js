@@ -10,35 +10,37 @@ function Registration() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [ruolo, setRuolo] = useState('studente'); // Di default, il ruolo è 'studente'
   const [error, setError] = useState(null); // Stato per gestire eventuali errori
+  
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Impedisce il refresh della pagina al submit
-    setError(null); // Resetta l'errore ad ogni submit
-
+    event.preventDefault();
+    setError(null);
+  
     if (password !== confirmPassword) {
       setError('Le password non corrispondono!');
       return;
     }
-
+  
     try {
-      const response = await fetch('/api/auth/register', { // Invia la richiesta all'API /register
+      const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ nome, cognome, email, password, ruolo })
       });
-
+  
+      const data = await response.json();
+      
       if (response.ok) {
-        // Registrazione avvenuta con successo
-        console.log('Utente registrato con successo!');
-        // TODO: Reindirizza alla pagina di login
+        console.log('Registrazione completata:', data);
+        // Handle successful registration
       } else {
-        // Errore durante la registrazione
-        const errorData = await response.json();
-        setError(errorData.message || 'Errore durante la registrazione.'); // Imposta il messaggio di errore
+        setError(data.message);
       }
     } catch (error) {
-      console.error('Errore di rete:', error);
-      setError('Errore di rete. Riprova più tardi.'); // Imposta un messaggio di errore generico per errori di rete
+      console.error('Errore:', error);
+      setError('Errore di connessione al server');
     }
   };
 
