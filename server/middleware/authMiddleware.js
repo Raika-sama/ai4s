@@ -1,42 +1,53 @@
 // server/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 
-// Get the secret key from environment variables
+// Ottieni la chiave segreta dalle variabili d'ambiente
 const secretKey = process.env.JWT_SECRET;
 
-// Check if the secret key is defined
+// Verifica che la chiave segreta sia definita
 if (!secretKey) {
     throw new Error("JWT_SECRET environment variable not defined.");
 }
 
 const authMiddleware = (req, res, next) => {
+    const authHeader = req.header('Authorization');
+
+    if (!authHeader) {
+        return res.status(401).json({ 
+            success: false,
+            message: 'Autenticazione richiesta. Header mancante.' 
+        });
+    }
+
+    // Verifica che l'header inizi con "Bearer "
+    if (!authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ 
+            success: false,
+            message: 'Formato token non valido. Utilizzare Bearer scheme.' 
+        });
+    }
+
+    const token = authHeader.split(' ')[1];
+
     try {
-        // Get token from Authorization header
-        const authHeader = req.header('Authorization');
-        if (!authHeader) {
-            return res.status(401).json({ message: 'Autenticazione richiesta. Header mancante.' });
-        }
-
-        // Check if it follows Bearer scheme
-        if (!authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ message: 'Formato token non valido. Utilizzare Bearer scheme.' });
-        }
-
-        const token = authHeader.split(' ')[1];
-        
-        // Verify token using the same secret key as in authRoutes.js
+        // Usa la stessa chiave segreta usata in authRoutes.js
         const decoded = jwt.verify(token, secretKey);
         req.user = decoded;
         next();
     } catch (error) {
-        // Provide more specific error messages
+        console.error('Errore verifica token:', error);
+        
         if (error.name === 'TokenExpiredError') {
-            return res.status(401).json({ message: 'Token scaduto. Effettua nuovamente il login.' });
+            return res.status(401).json({ 
+                success: false,
+                message: 'Token scaduto. Effettua nuovamente il login.' 
+            });
         }
-        if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({ message: 'Token non valido.' });
-        }
-        res.status(401).json({ message: 'Errore di autenticazione.' });
+        
+        return res.status(401).json({ 
+            success: false,
+            message: 'Token non valido.' 
+        });
     }
 };
 

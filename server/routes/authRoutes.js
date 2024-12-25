@@ -1,18 +1,13 @@
-// server/routes/authRoutes.js
-
 const express = require('express');
 const router = express.Router();
 const User = require('../models/Users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const authenticateJWT = require('../middleware/authMiddleware'); //Import the middleware
+const authenticateJWT = require('../middleware/authMiddleware');
 
-
-// Get the secret key from environment variables.  IMPORTANT!
 const secretKey = process.env.JWT_SECRET;
 
-//Check if the secret key is defined, otherwise throw an error
 if(!secretKey){
     throw new Error("JWT_SECRET environment variable not defined.");
 }
@@ -23,7 +18,10 @@ router.post('/register', async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email già registrata.' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Email già registrata.' 
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -36,67 +34,99 @@ router.post('/register', async (req, res) => {
     });
 
     await newUser.save();
-    const token = jwt.sign({ userId: newUser._id }, secretKey);
-        return res.status(201).json({ 
-        message: 'Utente registrato con successo!', 
-        token,
-        user: {
-            nome: newUser.nome,
-            email: newUser.email,
-            ruolo: newUser.ruolo
-        }
+    
+    const token = jwt.sign(
+      { 
+        userId: newUser._id,
+        email: newUser.email,
+        ruolo: newUser.ruolo 
+      }, 
+      secretKey,
+      { 
+        expiresIn: '24h'
+      }
+    );
+
+    return res.status(201).json({ 
+      success: true,
+      message: 'Utente registrato con successo!', 
+      token,
+      user: {
+        nome: newUser.nome,
+        cognome: newUser.cognome,
+        email: newUser.email,
+        ruolo: newUser.ruolo
+      }
     });
-    } catch (error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Errore durante la registrazione.' });
-    }
-  });
+    res.status(500).json({ 
+      success: false,
+      message: 'Errore durante la registrazione.' 
+    });
+  }
+});
 
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+    // Log della richiesta (senza password)
+    console.log('Tentativo di login per email:', email);
+
     const user = await User.findOne({ email });
     
     if (!user) {
-      return res.status(401).json({ message: 'Credenziali non valide.' });
+      console.log('Utente non trovato:', email);
+      return res.status(401).json({ 
+        success: false,
+        message: 'Credenziali non valide.' 
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Credenziali non valide.' });
+      console.log('Password non valida per utente:', email);
+      return res.status(401).json({ 
+        success: false,
+        message: 'Credenziali non valide.' 
+      });
     }
 
     const token = jwt.sign(
       { 
-          userId: user._id,
-          email: user.email,
-          ruolo: user.ruolo 
+        userId: user._id,
+        email: user.email,
+        ruolo: user.ruolo 
       }, 
       secretKey,
       { 
-          expiresIn: '24h' // Token expires in 24 hours
+        expiresIn: '24h'
       }
-  );
-    return res.json({ token });
+    );
+
+    console.log('Login riuscito per utente:', email);
+
+    return res.json({ 
+      success: true,
+      message: 'Login effettuato con successo!',
+      token,
+      user: {
+        nome: user.nome,
+        cognome: user.cognome,
+        email: user.email,
+        ruolo: user.ruolo
+      }
+    });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Errore durante il login.' });
+    console.error('Errore durante il login:', error);
+    return res.status(500).json({ 
+      success: false,
+      message: 'Errore durante il login.' 
+    });
   }
 });
 
-//This was incorrectly nested
-  router.get('/users/me', authenticateJWT, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.userId);
-        if (!user) {
-            return res.status(404).json({ message: 'Utente non trovato' });
-        }
-        const { password, ...userToSend } = user.toObject();
-        res.json(userToSend);
-    } catch (error) {
-        console.error('Errore nel recupero dell\'utente:', error);
-        res.status(500).json({ message: 'Errore del server' });
-    }
-});
+
 
 module.exports = router;

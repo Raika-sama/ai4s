@@ -3,29 +3,36 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/Users');
-const authMiddleware = require('../middleware/authMiddleware'); // Importa il middleware di autenticazione
+const authMiddleware = require('../middleware/authMiddleware');
 
-// API per ottenere i dati dell'utente autenticato
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    // req.user contiene i dati dell'utente autenticato (grazie al middleware)
-    const user = await User.findById(req.user.userId); // Ottieni l'utente dal database
+    const user = await User.findById(req.user.userId);
 
     if (!user) {
-      return res.status(404).json({ message: 'Utente non trovato.' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Utente non trovato.'
+      });
     }
 
-    // Restituisci i dati dell'utente (escludi la password)
-    res.json({ 
-      _id: user._id,
-      nome: user.nome, 
-      cognome: user.cognome, 
-      email: user.email, 
-      ruolo: user.ruolo 
+    // Restituisci i dati dell'utente con il campo success
+    res.json({
+      success: true,
+      user: {
+        _id: user._id,
+        nome: user.nome,
+        cognome: user.cognome,
+        email: user.email,
+        ruolo: user.ruolo
+      }
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Errore nel recupero dei dati utente.' });
+    res.status(500).json({ 
+      success: false,
+      message: 'Errore nel recupero dei dati utente.'
+    });
   }
 });
 

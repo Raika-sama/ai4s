@@ -1,9 +1,28 @@
-# AI4S - README
-
 ## Descrizione
+Questo progetto mira a sviluppare un'applicazione web per la somministrazione di test psicologici, con funzionalità di analisi dei dati e generazione di report. L'applicazione sarà conforme al GDPR e permetterà la somministrazione di test multipli, la generazione di PDF personalizzati per studente e la visualizzazione di dati aggregati per classe.
 
-Questo progetto si propone di sviluppare un'applicazione web per la somministrazione di test psicologici, con funzionalità di analisi dei dati e generazione di report. L'applicazione sarà conforme al GDPR e permetterà la somministrazione di test multipli, la generazione di PDF personalizzati per studente e la visualizzazione di dati aggregati per classe.
+## Stato attuale
 
+### Funzionalità implementate
+* **Frontend (React):**
+    * Autenticazione: Login e registrazione utente con JWT.
+    * Dashboard: Visualizzazione delle informazioni utente,  lista dei test disponibili (componente `AvailableTests`) e risultati recenti (componente `RecentResults`).
+    * Navigazione tra le pagine: Login, Dashboard, Test e Risultati.
+    * Somministrazione test: Pagina per la visualizzazione e la risposta alle domande del test.
+    * Visualizzazione risultati: Pagina per la visualizzazione dei risultati del test, con punteggio e profilo (per il test degli stili cognitivi).
+    * Logout: Funzionalità per terminare la sessione utente.
+* **Backend (Node.js & Express):**
+    * API per la gestione degli utenti: Registrazione, login, recupero dati utente.
+    * API per la gestione dei test: Recupero della lista dei test.
+    * API per la gestione dei risultati: Salvataggio e recupero dei risultati dei test.
+    * Middleware per l'autenticazione JWT.
+    * Connessione al database MongoDB Atlas.
+* **Microservizi (Python):**
+    * Microservizio per il calcolo del profilo e dei punteggi del test degli stili cognitivi.
+    * Funzione `calcolaProfilo` implementata per il test degli stili cognitivi.
+    * Integrazione parziale del microservizio con il backend Node.js.
+
+### Struttura del progetto
 ## Cronologia
 
 **25/12/2024:** 
@@ -61,51 +80,69 @@ Questo progetto si propone di sviluppare un'applicazione web per la somministraz
 * **Controllo versione:** Git e GitHub
 * **Hosting:** Da definire (Heroku o DigitalOcean)
 
-## Struttura del progetto
-
 ai4s/
-├── client/              # Cartella per il frontend (React)
-│   └── src/             # Questa cartella contiene tutto il codice sorgente della tua applicazione React.
-│       └── components/  # In questa cartella, è buona norma organizzare tutti i componenti riutilizzabili dell'interfaccia utente. Il componente Login è un buon esempio di componente riutilizzabile, in quanto potrebbe essere utilizzato in diverse parti dell'applicazione (es. nella pagina di login, in un modale, etc.).
+├── client/
+
+│   └── src/
+│       └── components/
+
+│           └── AvailableTests.js
+│           └── RecentResults.js
 │           └── Login.js
 │           └── Registration.js
-│       └── pages/       # Pagine dell'applicazione
+│       └── pages/
+
 │           └── LoginPage.js
-├── server/              # Cartella per il backend (Node.js)
-│   └── ...
-├── engines/             # Cartella per gli engine dei test (Python)
-│   └── ...
+│           └── Dashboard.js
+│           └── TestPage.js
+│           └── ResultPage.js
+│       └── App.js
+├── server/
+
+│   └── routes/
+│       └── authRoutes.js
+│       └── userRoutes.js
+│       └── testRoutes.js
+│       └── resultRoutes.js
+│   └── middleware/
+│       └── authMiddleware.js
+│   └── models/
+│       └── User.js
+│       └── Test.js
+│       └── Result.js
+│   └── app.js
+├── engines/
+
+│   └── stili_cognitivi/
+│       └── main.py
 └── ...
 
 
-## Installazione
+## Implementazioni future
 
-1. **Clonare il repository:** `git clone <url del repository>`
-2. **Installare le dipendenze del frontend:** `cd client && npm install`
-3. **Installare le dipendenze del backend:** `cd server && npm install`
+### Criticità
+* **Completare l'integrazione dei microservizi:** Assicurarsi che il backend Node.js inoltri correttamente le richieste ai microservizi Python e che gestisca le risposte.
+* **Implementare la visualizzazione dinamica dei risultati:**  In `ResultPage.js`, implementare la logica per visualizzare i risultati in modo diverso a seconda del tipo di test, utilizzando i dati restituiti dal microservizio Python.
+* **Migliorare la gestione degli errori:**  Gestire gli errori in modo più specifico e informativo, sia nel frontend che nel backend.
 
-## Avvio dell'applicazione
+### Funzionalità aggiuntive
+* **Completare la Dashboard:**  Aggiungere altre sezioni come "Statistiche" o "Profilo".
+* **Creare gli altri microservizi:**  Implementare i microservizi Python per gli altri tipi di test.
+* **Aggiungere la generazione del PDF:**  Implementare la funzionalità per generare un PDF con i risultati del test.
+* **Migliorare il design:**  Migliorare il design grafico dell'applicazione con CSS o una libreria di componenti UI.
+* **Testare l'applicazione:**  Scrivere test automatici per il frontend e il backend.
+* **Deployare l'applicazione:**  Deployare l'applicazione su un server di produzione.
 
-1. **Avviare il server di sviluppo:** `npm start` nella cartella `server`
-2. **Avviare l'applicazione React:** `npm start` nella cartella `client`
-
-## Contribuire al progetto
-
-1. Creare un branch per la nuova funzionalità o bug fix: `git checkout -b nome-branch`
-2. Effettuare le modifiche e committare: `git commit -m "Descrizione delle modifiche"`
-3. Pushare il branch: `git push origin nome-branch`
-4. Creare una pull request su GitHub.
+## Tecnologie utilizzate
+* **Frontend:** React, JavaScript, HTML, CSS, Tailwind CSS
+* **Backend:** Node.js, Express.js
+* **Database:** MongoDB Atlas
+* **Microservizi:** Python, Flask
+* **Autenticazione:** JWT (JSON Web Token)
+* **Controllo versione:** Git, GitHub
 
 ## Note
-
-* Il progetto è in fase iniziale di sviluppo.
+* Il progetto è in fase di sviluppo.
 * La documentazione verrà aggiornata man mano che il progetto procede.
 
-## Contatti
 
-* [Il tuo nome]
-* [Email]
-
-## Licenza
-
-MIT License

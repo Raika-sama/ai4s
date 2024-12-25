@@ -7,20 +7,16 @@ function Login() {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const savedEmail = localStorage.getItem('rememberedEmail');
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
-    }
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
+    setIsLoading(true);
 
     try {
+      console.log('Tentativo di login con:', { email });
+
       const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 
@@ -30,12 +26,15 @@ function Login() {
       });
 
       const data = await response.json();
+      console.log('Risposta dal server:', data);
       
-      if (response.ok && data.token) {
+      // Verifica se il login è riuscito (controlla sia il nuovo che il vecchio formato)
+      if (response.ok && (data.success || data.token)) {
+        console.log('Login riuscito, token ricevuto');
         // Salva il token
         localStorage.setItem('token', data.token);
         
-        // Salva i dati utente se disponibili
+        // Se abbiamo i dati utente, salvali
         if (data.user) {
           localStorage.setItem('userData', JSON.stringify(data.user));
         }
@@ -47,16 +46,23 @@ function Login() {
           localStorage.removeItem('rememberedEmail');
         }
         
+        // Reindirizza alla dashboard
         navigate('/dashboard');
       } else {
-        setError(data.message || 'Credenziali non valide');
+        // Gestisci l'errore
+        const errorMessage = data.message || 'Errore durante il login. Verifica le tue credenziali.';
+        console.log('Errore login:', errorMessage);
+        setError(errorMessage);
       }
     } catch (error) {
       console.error('Errore di rete:', error);
-      setError('Errore di connessione al server');
+      setError('Errore di connessione al server. Riprova più tardi.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Il resto del componente rimane invariato
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow">
       <h2 className="text-2xl font-bold mb-6">Login</h2>
@@ -75,6 +81,7 @@ function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={isLoading}
           className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
@@ -87,6 +94,7 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          disabled={isLoading}
           className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
@@ -97,6 +105,7 @@ function Login() {
           id="rememberMe"
           checked={rememberMe}
           onChange={(e) => setRememberMe(e.target.checked)}
+          disabled={isLoading}
           className="mr-2"
         />
         <label htmlFor="rememberMe" className="text-gray-700">Ricordami</label>
@@ -104,9 +113,12 @@ function Login() {
 
       <button 
         type="submit"
-        className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        disabled={isLoading}
+        className={`w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+          isLoading ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
       >
-        Login
+        {isLoading ? 'Accesso in corso...' : 'Login'}
       </button>
     </form>
   );
