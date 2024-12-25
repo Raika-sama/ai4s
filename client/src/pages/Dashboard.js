@@ -1,63 +1,93 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AvailableTests from "../components/AvailableTests"; // Importa il componente AvailableTests
+import AvailableTests from "../components/AvailableTests";
 
 function Dashboard() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Aggiungi uno stato per l'autenticazione
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-    const token = localStorage.getItem("token");
-    console.log("Token from localStorage:", token); // Log the token
+        const token = localStorage.getItem("token");
+        console.log("Token from localStorage:", token);
 
         if (!token) {
-          // Reindirizza solo se l'utente non è autenticato
-          if (!isAuthenticated) {
-            navigate("/login");
-          }
+          navigate("/login");
           return;
         }
 
-        const response = await fetch("/api/users/me", {
+        const response = await fetch("http://localhost:5000/api/users/me", {
+          method: 'GET',
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           },
         });
 
-    console.log("Response from /api/users/me:", response); // Log the response object
+        const data = await response.json();
+        
         if (response.ok) {
-          const data = await response.json();
           setUserData(data);
-          setIsAuthenticated(true); // Imposta l'utente come autenticato
         } else {
-      console.error("Errore nel recupero dei dati utente:", response.status, await response.text()); // Log the response status and body
+          // Se il token non è valido, pulisci il localStorage e reindirizza
+          if (response.status === 401) {
+            localStorage.removeItem('token');
+          }
+          setError(data.message || 'Errore nel recupero dei dati utente');
           navigate("/login");
         }
       } catch (error) {
-    console.error("Errore di rete dettagliato:", error); // Log the error object
-        navigate("/login");
+        console.error("Errore di rete:", error);
+        setError('Errore di connessione al server');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchUserData();
-  }, [navigate, isAuthenticated]); // Aggiungi isAuthenticated alle dipendenze
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   if (isLoading) {
-    return <div>Caricamento...</div>;
+    return <div className="flex justify-center items-center min-h-screen">
+      <div>Caricamento...</div>
+    </div>;
+  }
+
+  if (error) {
+    return <div className="flex justify-center items-center min-h-screen">
+      <div className="text-red-500">{error}</div>
+    </div>;
   }
 
   return userData ? (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Benvenuto, {userData.nome}!</p>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
+      </div>
+      
+      <div className="mb-6">
+        <p className="text-lg">Benvenuto, {userData.nome}!</p>
+        <p className="text-gray-600">Email: {userData.email}</p>
+        <p className="text-gray-600">Ruolo: {userData.ruolo}</p>
+      </div>
+
       <AvailableTests />
     </div>
   ) : null;
 }
+
 export default Dashboard;

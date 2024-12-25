@@ -77,6 +77,14 @@ router.post('/login', async (req, res) => {
           expiresIn: '24h' // Token expires in 24 hours
       }
   );
+    return res.json({ token });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Errore durante il login.' });
+  }
+});
+
+//This was incorrectly nested
   router.get('/users/me', authenticateJWT, async (req, res) => {
     try {
         const user = await User.findById(req.user.userId);
