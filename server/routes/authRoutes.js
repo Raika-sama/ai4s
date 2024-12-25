@@ -1,12 +1,21 @@
+// server/routes/authRoutes.js
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/Users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const authenticateJWT = require('../middleware/authMiddleware'); //Import the middleware
+
 
 // Get the secret key from environment variables.  IMPORTANT!
-const secretKey = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex'); // Fallback if not set, but not ideal
+const secretKey = process.env.JWT_SECRET;
+
+//Check if the secret key is defined, otherwise throw an error
+if(!secretKey){
+    throw new Error("JWT_SECRET environment variable not defined.");
+}
 
 router.post('/register', async (req, res) => {
   try {
@@ -28,7 +37,7 @@ router.post('/register', async (req, res) => {
 
     await newUser.save();
     const token = jwt.sign({ userId: newUser._id }, secretKey);
-    return res.status(201).json({ 
+        return res.status(201).json({ 
         message: 'Utente registrato con successo!', 
         token,
         user: {
@@ -37,15 +46,45 @@ router.post('/register', async (req, res) => {
             ruolo: newUser.ruolo
         }
     });
-  } catch (error) {
-    console.error("Error registering user:", error); // Log the error for debugging
-    return res.status(500).json({ message: 'Errore durante la registrazione.' });
-  }
-});
-
+    } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Errore durante la registrazione.' });
+    }
+  });
 
 router.post('/login', async (req, res) => {
-  // ... (login code remains unchanged)
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(401).json({ message: 'Credenziali non valide.' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Credenziali non valide.' });
+    }
+
+    const token = jwt.sign({ userId: user._id }, secretKey);
+    return res.json({ token });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Errore durante il login.' });
+    }
+  });
+  router.get('/users/me', authenticateJWT, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Utente non trovato' });
+        }
+        const { password, ...userToSend } = user.toObject();
+        res.json(userToSend);
+    } catch (error) {
+        console.error('Errore nel recupero dell\'utente:', error);
+        res.status(500).json({ message: 'Errore del server' });
+    }
 });
 
 module.exports = router;
