@@ -1,51 +1,47 @@
-Markdown
-
-# Test App - README
+# AI4S - README
 
 ## Descrizione
 
 Questo progetto si propone di sviluppare un'applicazione web per la somministrazione di test psicologici, con funzionalità di analisi dei dati e generazione di report.
 
+## Cronologia
+
+* **25/12/2024:** 
+    * Creazione del repository su GitHub.
+    * Definizione della struttura del progetto (frontend React, backend Node.js, engine Python).
+    * Scelta di MongoDB come database.
+    * Installazione di Node.js e creazione dell'app React.
+    * Risoluzione di un conflitto di dipendenze durante l'installazione di React.
+    * Aggiunta della stringa di connessione a MongoDB Atlas nel file `server/app.js`.
+    * Discussione sull'hosting e scelta di utilizzare un servizio con supporto per MongoDB e deploy da GitHub.
+
+## Prossimi passi
+
+* Definizione dettagliata delle funzionalità dell'applicazione.
+* Progettazione dell'interfaccia utente.
+* Sviluppo del backend (Node.js ed Express.js).
+* Integrazione degli engine dei test (Python).
+* Test e deploy dell'applicazione.
+
 ## Tecnologie
 
 * **Frontend:** React, JavaScript, HTML, CSS
 * **Backend:** Node.js, Express.js
-* **Database:** MongoDB
-* **Deploy:** PythonAnywhere (per ora)
+* **Database:** MongoDB Atlas
+* **Engine dei test:** Python
+* **Controllo versione:** Git e GitHub
+* **Hosting:** Da definire (Heroku o DigitalOcean)
 
 ## Struttura del progetto
 
-MindScanner/
-├── client/              # Cartella per il frontend (React)
-│   ├── public/          # File statici (index.html, favicon, etc.)
-│   ├── src/             # Codice sorgente React
-│   │   ├── components/    # Componenti React riutilizzabili
-│   │   ├── pages/       # Pagine dell'applicazione (login, dashboard, test, risultati)
-│   │   ├── App.js        # Componente principale
-│   │   ├── index.js      # Punto di ingresso dell'applicazione
-│   │   └── ...          # Altri file e cartelle
-│   └── package.json      # Definizione del progetto e dipendenze
-├── server/              # Cartella per il backend (Node.js)
-│   ├── routes/          # Definizione delle API REST
-│   ├── models/          # Modelli per i dati (utenti, test, risultati)
-│   ├── controllers/     # Logica di business per le API
-│   ├── app.js           # File principale del server
-│   └── package.json      # Definizione del progetto e dipendenze
-└── ...                 # Altri file e cartelle (es: configurazione, documentazione)
-MindScanner/
+ai4s/
 ├── client/              # Cartella per il frontend (React)
 │   └── ...
 ├── server/              # Cartella per il backend (Node.js)
 │   └── ...
 ├── engines/             # Cartella per gli engine dei test (Python)
-│   ├── stili_cognitivi/ # Engine per il test degli stili cognitivi
-│   │   ├── main.py      # Script principale dell'engine
-│   │   ├── utils.py     # Funzioni di utilità
-│   │   └── ...          # Altri file e moduli
-│   ├── test_2/         # Engine per il secondo tipo di test
-│   │   └── ...
 │   └── ...
-└── ...
+└── ..
 
 ## Installazione
 
@@ -67,14 +63,14 @@ MindScanner/
 
 ## Note
 
-* Assicurarsi di avere Node.js e npm installati sulla propria macchina.
-* Per il deploy su PythonAnywhere, seguire le istruzioni sulla piattaforma.
+* Il progetto è in fase iniziale di sviluppo.
+* La documentazione verrà aggiornata man mano che il progetto procede.
 
 ## Contatti
 
-* Riccardo Nicoli
-* Riccardonicolilb@gmail.com
+* [Il tuo nome]
+* [Email]
 
 ## Licenza
 
-[Specificare la licenza del progetto]
+MIT License
