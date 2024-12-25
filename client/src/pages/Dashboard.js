@@ -28,11 +28,6 @@ function Dashboard() {
         setUserData(JSON.parse(cachedUserData));
       }
 
-      
-      
-      
-      
-      
       try {
         console.log("Invio richiesta a /users/me con token:", token); // Debug
         
@@ -129,19 +124,21 @@ function Dashboard() {
       {userData.ruolo === 'studente' && (
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Test Disponibili</h2>
-          <AvailableTests />
+          <div> {/* Puoi usare un div per contenere la lista */}
+          <AvailableTests /> {/* Inserisci il componente qui */}
+        </div>
         </div>
       )}
 
       {userData.ruolo === 'insegnante' && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Gestione Test</h2>
-          <div className="grid gap-2">
-          <p><span className="font-medium">AvailableTests</span> </p>
-          <p><span className="font-medium">RecentResults</span></p>
-          </div>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Gestione Test</h2>
+        <div> {/* Puoi usare un div per contenere la lista */}
+          <AvailableTests /> {/* Inserisci il componente qui */}
         </div>
-      )}
+        {/* ... */}
+      </div>
+    )}
     </div>
   ) : null;
   
