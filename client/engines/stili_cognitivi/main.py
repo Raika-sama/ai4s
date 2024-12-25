@@ -147,6 +147,7 @@ def get_consigli(categoria, valore):
           ]
       },
     }
+
   return consigli.get(categoria, {}).get(valore, [])
 
 

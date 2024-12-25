@@ -3,7 +3,7 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // Importa il modello User
+const User = require('../models/Users'); // Importa il modello User
 const bcrypt = require('bcrypt'); // Importa bcrypt per la crittografia delle password
 const jwt = require('jsonwebtoken'); // Importa jsonwebtoken per la gestione dei token JWT
 const crypto = require('crypto');

@@ -2,24 +2,25 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AvailableTests from '../components/AvailableTests'; // Importa il componente AvailableTests
 
 function Dashboard() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Stato per indicare il caricamento
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          // Se non c'è un token, reindirizza alla pagina di login
-          navigate('/login'); 
+          navigate('/login');
           return;
         }
 
-        const response = await fetch('/api/users/me', { // Sostituisci con l'endpoint corretto per ottenere i dati dell'utente
+        const response = await fetch('/api/users/me', {
           headers: {
-            'Authorization': `Bearer ${token}` // Invia il token nell'header Authorization
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -27,33 +28,38 @@ function Dashboard() {
           const data = await response.json();
           setUserData(data);
         } else {
-          // Gestisci l'errore (es. token non valido)
           console.error('Errore nel recupero dei dati utente');
-          navigate('/login'); 
+          navigate('/login');
         }
       } catch (error) {
         console.error('Errore di rete:', error);
-        // Gestisci l'errore di rete
+        // Gestisci l'errore di rete (es. mostra un messaggio di errore)
+      } finally {
+        setIsLoading(false); // Imposta isLoading a false dopo la richiesta, indipendentemente dal risultato
       }
     };
 
     fetchUserData();
-  }, [navigate]); // Esegui l'effetto solo al montaggio del componente
+  }, [navigate]);
 
-  // Renderizza la dashboard solo se i dati utente sono disponibili
-  if (!userData) {
+  // Renderizza la dashboard solo se i dati utente sono disponibili e il caricamento è terminato
+  if (isLoading) {
     return <div>Caricamento...</div>;
+  }
+
+  if (!userData) {
+    return <div>Errore nel caricamento dei dati utente.</div>;
   }
 
   return (
     <div>
       <h1>Dashboard</h1>
-      <p>Benvenuto, {userData.nome}!</p> {/* Mostra il nome dell'utente */}
+      <p>Benvenuto, {userData.nome}!</p>
+
+      {/* Includi il componente AvailableTests */}
+      <AvailableTests /> 
 
       {/* TODO: Aggiungi le altre sezioni della dashboard */}
-      {/* Esempio: */}
-      {/* <AvailableTests /> */}
-      {/* <RecentResults /> */}
     </div>
   );
 }
@@ -61,10 +67,6 @@ function Dashboard() {
 export default Dashboard;
 
 
-Spiegazione del codice
-
-// Utilizza useNavigate per reindirizzare l'utente alla pagina di login se non è autenticato.
-// Utilizza useState per memorizzare i dati dell'utente.
-// Utilizza useEffect per recuperare i dati dell'utente dal backend tramite un'API protetta (che richiede il token JWT).
-// Mostra un messaggio di benvenuto con il nome dell'utente.
-// Include un placeholder per le altre sezioni della dashboard (AvailableTests, RecentResults, etc.).
+// Ho aggiunto isLoading per gestire lo stato di caricamento e mostrare un messaggio "Caricamento..." mentre i dati utente vengono recuperati.
+// Ho aggiunto un controllo per gestire il caso in cui userData sia null dopo il caricamento, mostrando un messaggio di errore.
+// Ho incluso il componente AvailableTests nella dashboard.
