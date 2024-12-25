@@ -19,6 +19,8 @@ Questo progetto si propone di sviluppare un'applicazione web per la somministraz
     * Definizione del ruolo dell'insegnante e funzionalità di caricamento studenti da Excel.
     * Creazione dei componenti React per la pagina di login (`Login.js`) e registrazione (`Registration.js`).
     * Creazione della pagina `LoginPage.js` che include i componenti di login e registrazione.
+    *Installazione delle dipendenze frontend: `react`, `react-router-dom`, `fetch` (nella cartella `client`).
+    * Installazione delle dipendenze backend: `express`, `mongoose`, 'bcrypt', 'jsonwebtoken' (nella cartella `server`).     
 
 
 ## Prossimi passi
