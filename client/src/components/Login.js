@@ -13,28 +13,30 @@ function Login() {
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/login', { // Invia la richiesta all'API /login
+      const response = await fetch('localhost:5000/api/auth/login', { // Invia la richiesta all'API /login
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
-      if (response.ok) {
-        // Login avvenuto con successo
-        const data = await response.json();
-        const token = data.token; 
-
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('token', data.token);
+          navigate('/dashboard');
+        
+      
         // Salva il token JWT (es. in localStorage)
         localStorage.setItem('token', token);
 
         // TODO: Reindirizza l'utente alla pagina protetta
         console.log('Login avvenuto con successo!');
-      } else {
+        } else {
         // Errore durante il login
         const errorData = await response.json();
         setError(errorData.message || 'Errore durante il login.');
-      }
-    } catch (error) {
+        }
+      } 
+      catch (error) {
       console.error('Errore di rete:', error);
       setError('Errore di rete. Riprova più tardi.');
     }
