@@ -34,3 +34,6 @@ Backend (Node.js)
     Apri un altro terminale Git Bash nella cartella client del tuo progetto.
     Esegui il comando npm start per avviare l'applicazione React.
     L'applicazione dovrebbe essere in esecuzione su http://localhost:3000. (il nome della finestra cambia in 'power shell')
+
+
+PER AVVIARE AMBIENTE VIRTUALE: source venv/Scripts/activate

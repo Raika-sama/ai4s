@@ -82,16 +82,32 @@ Questo progetto mira a sviluppare un'applicazione web per la somministrazione di
 
 ai4s/
 ├── client/
-
+│   └── engines/
+│       └── stili_cognitivi/
+│           └── main.py
+│           └── auth.py
+│           └── calculator.py
+│           └── utils.py
+│           └── validators.py
+│           └── config.py
+│           └── logger.py
+│           └── models.py
+│       └── venv/
 │   └── src/
 │       └── components/
-
 │           └── AvailableTests.js
 │           └── RecentResults.js
 │           └── Login.js
 │           └── Registration.js
+│           └── Sidebar.js
+│       └── layout
+│           └──MainLayout.js
+│       └──lib.js
+│           └──utils.js
+│       └── ui
+│           └── card.js
+│           └── dard.jsx
 │       └── pages/
-
 │           └── LoginPage.js
 │           └── Dashboard.js
 │           └── TestPage.js

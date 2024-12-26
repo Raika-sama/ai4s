@@ -82,16 +82,32 @@ Questo progetto mira a sviluppare un'applicazione web per la somministrazione di
 
 ai4s/
 ├── client/
-
+│   └── engines/
+│       └── stili_cognitivi/
+│           └── main.py
+│           └── auth.py
+│           └── calculator.py
+│           └── utils.py
+│           └── validators.py
+│           └── config.py
+│           └── logger.py
+│           └── models.py
+│       └── venv/
 │   └── src/
 │       └── components/
-
 │           └── AvailableTests.js
 │           └── RecentResults.js
 │           └── Login.js
 │           └── Registration.js
+│           └── Sidebar.js
+│       └── layout
+│           └──MainLayout.js
+│       └──lib.js
+│           └──utils.js
+│       └── ui
+│           └── card.js
+│           └── dard.jsx
 │       └── pages/
-
 │           └── LoginPage.js
 │           └── Dashboard.js
 │           └── TestPage.js
@@ -146,3 +162,38 @@ ai4s/
 * La documentazione verrà aggiornata man mano che il progetto procede.
 
 
+TO DO:
+Completamento Backend:
+
+
+Finalizzare l'integrazione del microservizio Python per l'elaborazione dei test
+Implementare la logica di gestione delle classi e degli studenti
+Aggiungere la funzionalità di import studenti da Excel
+Implementare il sistema di generazione report PDF
+
+
+Gestione Dati:
+
+
+Strutturare correttamente il database per scuole/classi/studenti
+Implementare query ottimizzate per i dati del dashboard
+Aggiungere caching per migliorare le performance
+Implementare backup automatici dei dati
+
+
+Sicurezza e GDPR:
+
+
+Rafforzare l'autenticazione (refresh token, password reset)
+Implementare la gestione dei consensi GDPR
+Aggiungere logging delle attività
+Implementare la crittografia dei dati sensibili
+
+
+Testing e Deploy:
+
+
+Scrivere test unitari per backend e frontend
+Configurare un ambiente di staging
+Preparare il sistema per il deployment
+Documentare l'API e le procedure di manutenzione

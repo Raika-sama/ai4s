@@ -1,7 +1,7 @@
 # validators.py
 
 from marshmallow import Schema, fields, validates, ValidationError
-from config import Config
+from client.engines.shared.config import Config
 from functools import wraps
 from flask import request, jsonify
 

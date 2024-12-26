@@ -1,17 +1,24 @@
 # main.py
 import os
+import sys
 
 from flask import Flask, request, jsonify
 import json
 from datetime import datetime
+import os
+import sys
 
-# Importiamo tutti i nostri componenti
-from config import Config, config_by_name
-from logger import setup_logger, log_request, log_response, log_error
-from auth import token_required
+# Aggiungi il percorso della cartella engines al PYTHONPATH
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Import corretti
+from shared.config import Config, config_by_name
+from shared.logger import setup_logger, log_request, log_response, log_error
+from shared.auth import token_required
 from validators import validate_test_input, validate_user_permissions
 from calculator import ProfileCalculator
-from models import TestInput, TestOutput, ProfiloCompleto
+from shared.models import TestInput, TestOutput, ProfiloCompleto
+
 
 # Inizializzazione Flask e componenti
 app = Flask(__name__)
