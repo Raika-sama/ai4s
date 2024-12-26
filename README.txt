@@ -146,38 +146,3 @@ ai4s/
 * La documentazione verrà aggiornata man mano che il progetto procede.
 
 
-TO DO:
-Completamento Backend:
-
-
-Finalizzare l'integrazione del microservizio Python per l'elaborazione dei test
-Implementare la logica di gestione delle classi e degli studenti
-Aggiungere la funzionalità di import studenti da Excel
-Implementare il sistema di generazione report PDF
-
-
-Gestione Dati:
-
-
-Strutturare correttamente il database per scuole/classi/studenti
-Implementare query ottimizzate per i dati del dashboard
-Aggiungere caching per migliorare le performance
-Implementare backup automatici dei dati
-
-
-Sicurezza e GDPR:
-
-
-Rafforzare l'autenticazione (refresh token, password reset)
-Implementare la gestione dei consensi GDPR
-Aggiungere logging delle attività
-Implementare la crittografia dei dati sensibili
-
-
-Testing e Deploy:
-
-
-Scrivere test unitari per backend e frontend
-Configurare un ambiente di staging
-Preparare il sistema per il deployment
-Documentare l'API e le procedure di manutenzione

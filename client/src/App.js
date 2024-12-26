@@ -1,24 +1,41 @@
 // src/App.js
-
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import MainLayout from './layouts/MainLayout';
 import LoginPage from './pages/LoginPage';
-import Dashboard from './pages/Dashboard';
-import TestPage from './pages/TestPages';
-import ResultPage from './pages/ResultPage';
 
-function App() {
+const App = () => {
+  // Funzione per verificare se l'utente è autenticato
+  const isAuthenticated = () => {
+    const token = localStorage.getItem('token');
+    return !!token;
+  };
+
+  // Componente per proteggere le route
+  const ProtectedRoute = ({ children }) => {
+    if (!isAuthenticated()) {
+      return <Navigate to="/login" replace />;
+    }
+    return children;
+  };
+
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} /> {/* Reindirizza alla pagina di login */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/test/:testId" element={<TestPage />} />
-        <Route path="/results/:resultId" element={<ResultPage />} />
+        {/* Route pubblica per il login */}
+        <Route path="/login" element={
+          isAuthenticated() ? <Navigate to="/dashboard" replace /> : <LoginPage />
+        } />
+
+        {/* Route protetta per il layout principale */}
+        <Route path="/*" element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        } />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-}
+};
 
 export default App;

@@ -1,251 +1,174 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Layout from "./Layout";
-import AvailableTests from "../components/AvailableTests";
-import RecentResults from "../components/RecentResults";
+import React, { useState } from 'react';
 
-function Dashboard() {
-  const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+import { 
+  Activity, 
+  BookOpen, 
+  Users, 
+  Clock, 
+  CheckCircle2, 
+  PlusCircle, 
+  GraduationCap, 
+  FileSpreadsheet 
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-  // Mantengo intatta la logica di autenticazione esistente
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem("token");
-      console.log("Token recuperato:", token); // Debug
+const chartData = [
+  { name: 'Lun', completati: 4, inCorso: 2 },
+  { name: 'Mar', completati: 3, inCorso: 1 },
+  { name: 'Mer', completati: 5, inCorso: 3 },
+  { name: 'Gio', completati: 7, inCorso: 4 },
+  { name: 'Ven', completati: 6, inCorso: 2 },
+];
 
-      const cachedUserData = localStorage.getItem("userData");
-      console.log("Dati utente in cache:", cachedUserData); // Debug
-
-      if (!token) {
-        console.log("Nessun token trovato, reindirizzamento al login"); // Debug
-        navigate("/login");
-        return;
+const Dashboard = () => {
+  const [dashboardData] = useState({
+    stats: {
+      testDisponibili: 8,
+      testCompletati: 45,
+      testInCorso: 3,
+      mediaRisultati: 78
+    },
+    recentActivities: [
+      {
+        title: "Test Cognitivo completato",
+        class: "Classe 3A - 24 studenti",
+        time: "2 ore fa",
+        status: "completed"
+      },
+      {
+        title: "Test Logico iniziato",
+        class: "Classe 4B - in corso",
+        time: "30 minuti fa",
+        status: "in_progress"
       }
+    ]
+  });
 
-      if (cachedUserData) {
-        setUserData(JSON.parse(cachedUserData));
-      }
+  const statsCards = [
+    {
+      title: "Test Disponibili",
+      value: dashboardData.stats.testDisponibili,
+      icon: BookOpen,
+      color: "text-blue-600",
+      bgColor: "bg-blue-100"
+    },
+    {
+      title: "Test Completati", 
+      value: dashboardData.stats.testCompletati,
+      icon: CheckCircle2,
+      color: "text-green-600",
+      bgColor: "bg-green-100"
+    },
+    {
+      title: "Test in Corso",
+      value: dashboardData.stats.testInCorso,
+      icon: Clock,
+      color: "text-orange-600",
+      bgColor: "bg-orange-100"
+    },
+    {
+      title: "Media Risultati",
+      value: `${dashboardData.stats.mediaRisultati}%`,
+      icon: Activity,
+      color: "text-purple-600",
+      bgColor: "bg-purple-100"
+    }
+  ];
 
-      try {
-        console.log("Invio richiesta a /users/me con token:", token); // Debug
-        
-        const response = await fetch("http://localhost:5000/api/users/me", {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-        });
-
-        console.log("Risposta ricevuta:", {
-          status: response.status,
-          statusText: response.statusText
-        }); // Debug
-
-        const data = await response.json();
-        console.log("Dati ricevuti:", data); // Debug
-
-        if (response.ok) {
-          const userData = data.success ? data.user : data;
-          setUserData(userData);
-          localStorage.setItem('userData', JSON.stringify(userData));
-          setError(null);
-        } else {
-          if (response.status === 401) {
-            console.log("Token non valido, reindirizzamento al login");
-            localStorage.removeItem('token');
-            localStorage.removeItem('userData');
-            navigate("/login");
-          } else {
-            setError(data.message || 'Errore nel recupero dei dati utente');
-          }
-        }
-      } catch (error) {
-        console.error("Errore di rete dettagliato:", error);
-        setError('Errore di connessione al server');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('rememberedEmail');
-    navigate('/login');
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-lg">Caricamento...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-red-500">{error}</div>
-      </div>
-    );
-  }
-
-  return userData ? (
-    <Layout userData={userData} onLogout={handleLogout}>
-      <div className="space-y-6">
-        {/* Stats Overview - Responsive grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Test Completati */}
-          <div className="bg-white rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">Test Completati</p>
-                <h3 className="text-xl font-bold">0</h3>
+  return (
+    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {statsCards.map((card, index) => (
+          <Card key={index} className="hover:shadow-lg transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-gray-500">
+                {card.title}
+              </CardTitle>
+              <div className={`${card.bgColor} p-2 rounded-lg`}>
+                <card.icon className={`w-4 h-4 ${card.color}`} />
               </div>
-              <div className="bg-yellow-100 p-2 rounded-full">
-                <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                </svg>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{card.value}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Activity Chart */}
+      <Card className="col-span-4">
+        <CardHeader>
+          <CardTitle>Attività Settimanale</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorCompletati" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorInCorso" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#EC4899" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#EC4899" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200" />
+                <XAxis dataKey="name" className="text-xs" />
+                <YAxis className="text-xs" />
+                <Tooltip />
+                <Area
+                  type="monotone"
+                  dataKey="completati"
+                  stroke="#4F46E5"
+                  fillOpacity={1}
+                  fill="url(#colorCompletati)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="inCorso"
+                  stroke="#EC4899"
+                  fillOpacity={1}
+                  fill="url(#colorInCorso)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Attività Recenti</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {dashboardData.recentActivities.map((activity, index) => (
+            <div key={index} 
+              className="flex items-start space-x-4 p-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+              <div className={`p-2 rounded-full ${
+                activity.status === 'completed' ? 'bg-green-100' : 'bg-yellow-100'
+              }`}>
+                {activity.status === 'completed' ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-600" />
+                ) : (
+                  <Clock className="w-5 h-5 text-yellow-600" />
+                )}
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900">{activity.title}</h3>
+                <p className="text-sm text-gray-600">{activity.class}</p>
+                <p className="text-sm text-gray-500 mt-1">{activity.time}</p>
               </div>
             </div>
-          </div>
-
-          {userData.ruolo === 'insegnante' ? (
-            <>
-              {/* Statistiche Insegnante */}
-              <div className="bg-white rounded-lg shadow p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Test Creati</p>
-                    <h3 className="text-xl font-bold">0</h3>
-                  </div>
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M12 4v16m8-8H4"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Da Correggere</p>
-                    <h3 className="text-xl font-bold">0</h3>
-                  </div>
-                  <div className="bg-green-100 p-2 rounded-full">
-                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Studenti Attivi</p>
-                    <h3 className="text-xl font-bold">0</h3>
-                  </div>
-                  <div className="bg-purple-100 p-2 rounded-full">
-                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Statistiche Studente */}
-              <div className="bg-white rounded-lg shadow p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Media Voti</p>
-                    <h3 className="text-xl font-bold">-</h3>
-                  </div>
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Test in Corso</p>
-                    <h3 className="text-xl font-bold">0</h3>
-                  </div>
-                  <div className="bg-green-100 p-2 rounded-full">
-                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Quick Actions - Adjusted spacing */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Azioni Rapide</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {userData.ruolo === 'insegnante' ? (
-              <>
-                <a href="#" className="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                  <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M12 4v16m8-8H4"/>
-                  </svg>
-                  <span className="text-sm">Nuovo Test</span>
-                </a>
-                <a href="#" className="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
-                  <span className="text-sm">Correggi Test</span>
-                </a>
-              </>
-            ) : (
-              <>
-                <a href="#" className="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                  <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  <span className="text-sm">Inizia Test</span>
-                </a>
-                <a href="#" className="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                  </svg>
-                  <span className="text-sm">I Miei Risultati</span>
-                </a>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Test Section - Proper container */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">
-            {userData.ruolo === 'studente' ? 'Test Disponibili' : 'Gestione Test'}
-          </h2>
-          <div className="max-w-full overflow-x-auto">
-            <AvailableTests />
-          </div>
-        </div>
-      </div>
-    </Layout>
-  ) : null;
-}
+          ))}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 export default Dashboard;
