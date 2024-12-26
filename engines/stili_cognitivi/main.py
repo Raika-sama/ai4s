@@ -14,8 +14,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from shared.config import Config, config_by_name
 from shared.logger import setup_logger, log_request, log_response, log_error
 from shared.auth import token_required
-from validators import validate_test_input, validate_user_permissions
-from calculator import ProfileCalculator
+from .validators import validate_test_input, validate_user_permissions
+from .calculator import ProfileCalculator
 from shared.models import TestInput, TestOutput, ProfiloCompleto
 
 # Verifica delle variabili d'ambiente necessarie
