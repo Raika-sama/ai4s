@@ -11,14 +11,12 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN rm -rf node_modules
-RUN npm cache clean --force
-
-# Install dependencies with the correct flags
-RUN npm install --build-from-source bcrypt
 RUN npm install
 
 COPY . .
+
+# Rebuild bcrypt to ensure compatibility with alpine
+RUN npm rebuild bcrypt --build-from-source
 
 EXPOSE 5000
 

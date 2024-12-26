@@ -35,10 +35,7 @@ app.use(cors(corsOptions));
 // Il resto del codice rimane invariato...
 const uri = process.env.MONGODB_URI || "mongodb+srv://RaikaSama:5LxHzpgip4CNxPMx@ai4sdb.7leax.mongodb.net/?retryWrites=true&w=majority&appName=ai4sDB";
 
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(uri)
 .then(() => {
   console.log('Connessione a MongoDB avvenuta con successo!');
 })
