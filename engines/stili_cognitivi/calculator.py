@@ -2,7 +2,7 @@
 
 from typing import List, Dict, Any
 import logging
-from client.engines.shared.config import Config
+from shared.config import Config
 
 class ProfileCalculator:
     def __init__(self):

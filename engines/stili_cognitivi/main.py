@@ -1,12 +1,11 @@
-# main.py
-import os
-import sys
-
+# engines/stili_cognitivi/main.py
 from flask import Flask, request, jsonify
 import json
 from datetime import datetime
 import os
 import sys
+import logging
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Aggiungi il percorso della cartella engines al PYTHONPATH
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,9 +18,18 @@ from validators import validate_test_input, validate_user_permissions
 from calculator import ProfileCalculator
 from shared.models import TestInput, TestOutput, ProfiloCompleto
 
+# Verifica delle variabili d'ambiente necessarie
+if not os.environ.get('JWT_SECRET'):
+    raise ValueError("JWT_SECRET environment variable not set")
+
+if not os.environ.get('FLASK_ENV'):
+    os.environ['FLASK_ENV'] = 'dev'
 
 # Inizializzazione Flask e componenti
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
+# Setup logger
 logger = setup_logger()
 calculator = ProfileCalculator()
 
@@ -29,14 +37,28 @@ calculator = ProfileCalculator()
 env = os.getenv('FLASK_ENV', 'dev')
 app.config.from_object(config_by_name[env])
 
+@app.before_request
+def before_request():
+    """Log della richiesta in arrivo"""
+    if request.path != '/health':  # Ignora health checks
+        logger.info(f'Richiesta ricevuta: {request.method} {request.path}')
+
+@app.after_request
+def after_request(response):
+    """Log della risposta in uscita"""
+    if request.path != '/health':  # Ignora health checks
+        logger.info(f'Risposta inviata: Status {response.status_code}')
+    return response
+
 @app.route('/health', methods=['GET'])
 def health_check():
-    """
-    Endpoint per verificare che il servizio sia attivo
-    """
+    """Endpoint per verificare che il servizio sia attivo"""
     return jsonify({
+        'success': True,
         'status': 'healthy',
-        'timestamp': datetime.now().isoformat()
+        'timestamp': datetime.now().isoformat(),
+        'service': 'stili_cognitivi',
+        'version': '1.0'
     })
 
 @app.route('/calculate', methods=['POST'])
@@ -44,9 +66,7 @@ def health_check():
 @validate_test_input
 @validate_user_permissions(['studente', 'insegnante'])
 def calculate(current_user):
-    """
-    Endpoint principale per il calcolo del profilo
-    """
+    """Endpoint principale per il calcolo del profilo"""
     try:
         # Log della richiesta
         log_request(logger, request.validated_data, current_user)
@@ -92,3 +112,15 @@ def calculate(current_user):
             message="Errore durante l'elaborazione",
             errors={'detail': str(e)}
         ).__dict__), 500
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5001))
+    host = '0.0.0.0' if env == 'prod' else 'localhost'
+    
+    logger.info(f'Avvio del servizio stili_cognitivi su {host}:{port} in modalità {env}')
+    
+    app.run(
+        host=host,
+        port=port,
+        debug=env == 'dev'
+    )
