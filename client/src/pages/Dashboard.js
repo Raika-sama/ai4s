@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Layout from "./Layout";
 import AvailableTests from "../components/AvailableTests";
 import RecentResults from "../components/RecentResults";
 
@@ -8,7 +9,6 @@ function Dashboard() {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Mantengo intatta la logica di autenticazione esistente
   useEffect(() => {
@@ -98,93 +98,153 @@ function Dashboard() {
   }
 
   return userData ? (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside id="sidebar" className={`w-64 bg-white shadow-lg flex-shrink-0 ${!sidebarOpen && 'hidden'} md:block`}>
-        <div className="h-full px-3 py-4 overflow-y-auto">
-          <div className="flex items-center pl-2.5 mb-5">
-            <span className="self-center text-xl font-semibold whitespace-nowrap">Test Platform</span>
-          </div>
-          
-          <ul className="space-y-2 font-medium">
-            <li>
-              <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    <Layout userData={userData} onLogout={handleLogout}>
+      <div className="space-y-6">
+        {/* Stats Overview - Responsive grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Test Completati */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500">Test Completati</p>
+                <h3 className="text-xl font-bold">0</h3>
+              </div>
+              <div className="bg-yellow-100 p-2 rounded-full">
+                <svg className="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                 </svg>
-                <span className="ml-3">Dashboard</span>
-              </a>
-            </li>
-            {userData.ruolo === 'insegnante' && (
-              <>
-                <li>
-                  <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
-                    <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </div>
+            </div>
+          </div>
+
+          {userData.ruolo === 'insegnante' ? (
+            <>
+              {/* Statistiche Insegnante */}
+              <div className="bg-white rounded-lg shadow p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Test Creati</p>
+                    <h3 className="text-xl font-bold">0</h3>
+                  </div>
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M12 4v16m8-8H4"/>
                     </svg>
-                    <span className="ml-3">Gestione Test</span>
-                  </a>
-                </li>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Da Correggere</p>
+                    <h3 className="text-xl font-bold">0</h3>
+                  </div>
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Studenti Attivi</p>
+                    <h3 className="text-xl font-bold">0</h3>
+                  </div>
+                  <div className="bg-purple-100 p-2 rounded-full">
+                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Statistiche Studente */}
+              <div className="bg-white rounded-lg shadow p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Media Voti</p>
+                    <h3 className="text-xl font-bold">-</h3>
+                  </div>
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Test in Corso</p>
+                    <h3 className="text-xl font-bold">0</h3>
+                  </div>
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Quick Actions - Adjusted spacing */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-4">Azioni Rapide</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {userData.ruolo === 'insegnante' ? (
+              <>
+                <a href="#" className="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                  <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M12 4v16m8-8H4"/>
+                  </svg>
+                  <span className="text-sm">Nuovo Test</span>
+                </a>
+                <a href="#" className="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                  <span className="text-sm">Correggi Test</span>
+                </a>
+              </>
+            ) : (
+              <>
+                <a href="#" className="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                  <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span className="text-sm">Inizia Test</span>
+                </a>
+                <a href="#" className="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                  </svg>
+                  <span className="text-sm">I Miei Risultati</span>
+                </a>
               </>
             )}
-            {userData.ruolo === 'studente' && (
-              <li>
-                <a href="#" className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100">
-                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  <span className="ml-3">I Miei Test</span>
-                </a>
-              </li>
-            )}
-          </ul>
+          </div>
         </div>
-      </aside>
 
-      {/* Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Navigation */}
-        <nav className="bg-white border-b border-gray-200 px-4 py-2.5">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2 text-gray-600 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              <span className="ml-2 text-xl font-semibold">Dashboard</span>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                {userData.nome} {userData.cognome}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm text-white bg-red-500 rounded-lg hover:bg-red-600 transition duration-200"
-              >
-                Logout
-              </button>
-            </div>
+        {/* Test Section - Proper container */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            {userData.ruolo === 'studente' ? 'Test Disponibili' : 'Gestione Test'}
+          </h2>
+          <div className="max-w-full overflow-x-auto">
+            <AvailableTests />
           </div>
-        </nav>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-          {/* Il contenuto principale verrà aggiunto nella prossima iterazione */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Informazioni Utente</h2>
-            <div className="grid gap-2">
-              <p><span className="font-medium">Email:</span> {userData.email}</p>
-              <p><span className="font-medium">Ruolo:</span> {userData.ruolo.charAt(0).toUpperCase() + userData.ruolo.slice(1)}</p>
-            </div>
-          </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </Layout>
   ) : null;
 }
 
