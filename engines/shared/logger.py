@@ -1,76 +1,53 @@
-# logger.py
+# engines/shared/logger.py
 
 import logging
 from logging.handlers import RotatingFileHandler
 import os
 from datetime import datetime
 
-# logger.py
-def log_request(logger, request_data, user=None):
-    """Log dei dati della richiesta con info utente"""
-    user_info = f"User: {user['email']}" if user else "User: Anonymous"
-    logger.info(f"Nuova richiesta ricevuta - {user_info} - Data: {request_data}")
-
 def setup_logger():
-    """
-    Configura e restituisce un logger per il microservizio.
-    Include:
-    - Logging su file con rotazione
-    - Logging su console
-    - Formattazione timestamp
-    - Livelli di logging differenziati
-    """
-    # Crea la cartella logs se non esiste
+    """Configura e restituisce un logger per il microservizio."""
     log_dir = 'logs'
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    # Nome file log con data
     log_filename = os.path.join(
         log_dir, 
         f'stili_cognitivi_{datetime.now().strftime("%Y%m%d")}.log'
     )
 
-    # Configura il logger principale
     logger = logging.getLogger('stili_cognitivi')
     logger.setLevel(logging.INFO)
 
-    # Formattazione dei log
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
-    # Handler per il file con rotazione
     file_handler = RotatingFileHandler(
         log_filename,
-        maxBytes=1024 * 1024,  # 1MB
+        maxBytes=1024 * 1024,
         backupCount=5
     )
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
 
-    # Handler per la console
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
     console_handler.setLevel(logging.DEBUG)
 
-    # Aggiungi gli handler al logger
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
 
-    # Log iniziale per verificare che tutto funzioni
-    logger.info('Logger inizializzato con successo')
-
     return logger
 
-# Funzioni helper per log specifici
-def log_request(logger, request_data):
-    """Log dei dati della richiesta"""
-    logger.info(f"Nuova richiesta ricevuta: {request_data}")
+def log_request(logger, data, user_info=None):
+    """Log dei dati della richiesta con info utente opzionale"""
+    user_str = f" - User: {user_info['email']}" if user_info else ""
+    logger.info(f"Nuova richiesta ricevuta{user_str} - Data: {data}")
 
-def log_response(logger, response_data):
+def log_response(logger, response):
     """Log della risposta"""
-    logger.info(f"Risposta inviata: {response_data}")
+    logger.info(f"Risposta inviata: {response}")
 
 def log_error(logger, error_msg, exc_info=None):
     """Log degli errori"""

@@ -1,5 +1,11 @@
 # engines/shared/config.py
 import os
+from dotenv import load_dotenv
+import pathlib
+
+# Trova il file .env nella cartella engines/stili_cognitivi
+env_path = pathlib.Path(__file__).parent.parent / 'stili_cognitivi' / '.env'
+load_dotenv(dotenv_path=env_path)
 
 class Config:
     """Configurazione base"""
@@ -9,9 +15,9 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     
     # Configurazioni JWT
-    JWT_SECRET_KEY = os.environ.get('JWT_SECRET')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET')
     if not JWT_SECRET_KEY:
-        raise ValueError("JWT_SECRET environment variable not set")
+        raise ValueError("JWT_SECRET environment variable not set. Check your .env file")
     
     JWT_ACCESS_TOKEN_EXPIRES = 24 * 3600  # 24 ore in secondi
 
@@ -38,7 +44,7 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     """Configurazione per produzione"""
     HOST = '0.0.0.0'
-    PORT = int(os.environ.get('PORT', 5001))
+    PORT = int(os.getenv('PORT', 5001))
 
 config_by_name = dict(
     dev=DevelopmentConfig,
