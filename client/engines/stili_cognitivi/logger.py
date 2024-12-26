@@ -5,6 +5,12 @@ from logging.handlers import RotatingFileHandler
 import os
 from datetime import datetime
 
+# logger.py
+def log_request(logger, request_data, user=None):
+    """Log dei dati della richiesta con info utente"""
+    user_info = f"User: {user['email']}" if user else "User: Anonymous"
+    logger.info(f"Nuova richiesta ricevuta - {user_info} - Data: {request_data}")
+
 def setup_logger():
     """
     Configura e restituisce un logger per il microservizio.
