@@ -15,12 +15,18 @@ const schoolSchema = new mongoose.Schema({
         required: true,
         enum: ['primo_grado', 'secondo_grado', 'entrambi']
     },
-    indirizzo_scolastico: [{
-        type: String,
-        // Esempio: ['liceo_scientifico', 'liceo_classico']
-        // Richiesto solo se tipo_istituto include secondo_grado
-    }],
-    // Dati geografici
+    indirizzo_scolastico: {
+        type: [{
+            type: String,
+            enum: ['liceo_scientifico', 'liceo_classico', 'tecnico', 'professionale']
+        }],
+        validate: {
+            validator: function(v) {
+                return this.tipo_istituto !== 'primo_grado' || v.length === 0;
+            },
+            message: 'Indirizzi scolastici non permessi per scuole di primo grado'
+        }
+    },
     regione: {
         type: String,
         required: true
@@ -56,7 +62,7 @@ const schoolSchema = new mongoose.Schema({
     updated_at: {
         type: Date,
         default: Date.now
-    }
+    },
     users: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
