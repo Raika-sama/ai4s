@@ -7,8 +7,9 @@ const SchoolPage = () => {
   const [school, setSchool] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
 
-  useEffect(() => {
+  
     const fetchSchool = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/schools/assigned');
@@ -24,7 +25,7 @@ const SchoolPage = () => {
         setLoading(false);
       }
     };
-
+    useEffect(() => {
     fetchSchool();
   }, []);
 

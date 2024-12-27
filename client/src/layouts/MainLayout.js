@@ -3,9 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { Menu, User, LogOut, Settings } from 'lucide-react';
 import axios from 'axios'; // Aggiungi questo import
 import Sidebar from '../components/Sidebar';
-import Dashboard from '../pages/Dashboard';
-import SchoolPage from '../pages/SchoolPage';
-import Classes from '../pages/Classes'; // Aggiungi questo import
+
 
 const MainLayout = () => {
   const navigate = useNavigate();
@@ -89,7 +87,7 @@ const MainLayout = () => {
             </button>
             <span className="text-xl font-semibold">Test Platform</span>
           </div>
-
+  
           {/* User menu */}
           <div className="relative">
             <button
@@ -106,7 +104,7 @@ const MainLayout = () => {
                 </div>
               )}
             </button>
-
+  
             {isUserMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 border border-gray-200">
                 <button
@@ -121,13 +119,10 @@ const MainLayout = () => {
           </div>
         </div>
       </header>
-
+  
       {/* Main Container */}
       <div className="flex flex-1 pt-16">
-        {/* Sidebar */}
         <Sidebar isOpen={isSidebarOpen} />
-
-        {/* Main Content Area */}
         <main className={`flex-1 transition-all duration-300 bg-gray-50
           ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
           <Outlet />

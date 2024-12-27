@@ -38,6 +38,7 @@ const App = () => {  // Corretta la sintassi della dichiarazione
           </ProtectedRoute>
         }>
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="schools" element={<SchoolPage />} /> {/* Aggiunta route per schools */}
           <Route path="classes" element={<Classes />} />
           <Route path="classes/:classId" element={<ClassDetail />} />
           <Route index element={<Navigate to="/dashboard" replace />} />
