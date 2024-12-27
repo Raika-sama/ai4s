@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  client:
+    build: 
+      context: ./client
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://server:5000
+      - REACT_APP_AUTH_HEADER=Authorization
+      - REACT_APP_TOKEN_PREFIX=Bearer
+    depends_on:
+      - server
+
+  server:
+    build: 
+      context: ./server
+    ports:
+      - "5000:5000"
+    environment:
+      - CORS_ORIGIN=http://localhost:3000
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=24h
+      - TOKEN_PREFIX=Bearer
+      - MONGODB_URI=${MONGODB_URI}
+    depends_on:
+      - stili-cognitivi
+
+  stili-cognitivi:
+    build:
+      context: .
+      dockerfile: engines/stili_cognitivi/Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=HS256
+      - TOKEN_PREFIX=Bearer

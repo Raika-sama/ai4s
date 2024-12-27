@@ -41,9 +41,9 @@ function Login() {
         
         // Gestisci "Ricordami"
         if (rememberMe) {
-          localStorage.setItem('rememberedEmail', email);
+          localStorage.setItem('rememberMe', 'true');
         } else {
-          localStorage.removeItem('rememberedEmail');
+          localStorage.removeItem('rememberMe');
         }
         
         // Reindirizza alla dashboard
