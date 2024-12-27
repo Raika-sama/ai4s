@@ -9,6 +9,8 @@ ENV REACT_APP_AUTH_HEADER=Authorization
 ENV REACT_APP_TOKEN_PREFIX=Bearer
 
 COPY package*.json ./
+# Installa esplicitamente le dipendenze di Material-UI
+RUN npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
 RUN npm install
 COPY . .
 RUN npm run build

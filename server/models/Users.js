@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['studente', 'insegnante', 'amministratore'], // Definisce i ruoli possibili
     default: 'studente'
+  },
+  school: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'School'  // Riferimento al modello School
   }
 });
 
