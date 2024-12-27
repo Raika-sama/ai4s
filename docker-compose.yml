@@ -7,11 +7,13 @@ services:
     ports:
       - "3000:80"
     environment:
-      - REACT_APP_API_URL=http://server:5000
+      - REACT_APP_API_URL=http://localhost:5000  # Modifica qui
       - REACT_APP_AUTH_HEADER=Authorization
       - REACT_APP_TOKEN_PREFIX=Bearer
     depends_on:
       - server
+    networks:
+      - app-network
 
   server:
     build: 
@@ -27,6 +29,8 @@ services:
       - MONGODB_URI=${MONGODB_URI}
     depends_on:
       - stili-cognitivi
+    networks:
+      - app-network
 
   stili-cognitivi:
     build:
@@ -38,3 +42,9 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_ALGORITHM=HS256
       - TOKEN_PREFIX=Bearer
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

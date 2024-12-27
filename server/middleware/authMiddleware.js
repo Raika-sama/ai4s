@@ -1,6 +1,19 @@
 // server/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 
+const rateLimit = require('express-rate-limit'); // Time limiter
+
+
+// Configurazione rate limiting
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minuti
+    max: 5, // limite di 5 tentativi
+    message: {
+        success: false,
+        message: 'Troppi tentativi di login. Riprova tra 15 minuti.'
+    }
+});
+
 // Ottieni la chiave segreta dalle variabili d'ambiente
 const secretKey = process.env.JWT_SECRET;
 
@@ -51,4 +64,7 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-module.exports = authMiddleware;
+module.exports = {
+    authMiddleware,
+    loginLimiter
+};

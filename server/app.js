@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
+ 
 const app = express();
 app.use(express.json());
 
@@ -14,6 +14,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const testRoutes = require('./routes/testRoutes');
 const resultRoutes = require('./routes/resultRoutes');
+const schoolRoutes = require('./routes/schoolRoutes');
 
 // Configurazione CORS più permissiva per sviluppo
 const corsOptions = {
@@ -35,12 +36,18 @@ app.use(cors(corsOptions));
 // Il resto del codice rimane invariato...
 const uri = process.env.MONGODB_URI || "mongodb+srv://RaikaSama:5LxHzpgip4CNxPMx@ai4sdb.7leax.mongodb.net/?retryWrites=true&w=majority&appName=ai4sDB";
 
+
 mongoose.connect(uri)
 .then(() => {
-  console.log('Connessione a MongoDB avvenuta con successo!');
+    console.log('Connessione a MongoDB avvenuta con successo!');
+    // Stampa le collezioni disponibili per verifica connessione
+    mongoose.connection.db.listCollections().toArray()
+    .then(collections => {
+        console.log('Collections:', collections.map(c => c.name));
+    });
 })
 .catch(err => {
-  console.error('Errore di connessione a MongoDB:', err);
+    console.error('Errore di connessione a MongoDB:', err);
 });
 
 app.use('/api/auth', authRoutes);
@@ -66,3 +73,5 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Server in ascolto sulla porta ${port}`);
 });
+
+app.use('/api/schools', schoolRoutes); // aggiunta la rotta per gestire le scuole

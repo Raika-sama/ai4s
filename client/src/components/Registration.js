@@ -138,6 +138,7 @@ function Registration() {
           disabled={isLoading}
           className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
+          <option value="amministratore">Amministratore</option>
           <option value="studente">Studente</option>
           <option value="insegnante">Insegnante</option>
         </select>

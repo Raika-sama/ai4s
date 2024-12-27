@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { Menu, User, LogOut, Settings } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../pages/Dashboard';
+import SchoolPage from '../pages/SchoolPage';
 
 const MainLayout = () => {
   const navigate = useNavigate(); // Hook correttamente importato
@@ -109,7 +110,8 @@ const MainLayout = () => {
         <main className={`flex-1 transition-all duration-300 bg-gray-50
           ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
           <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/schools" element={<SchoolPage />} />  {/* Aggiungi questa linea */}
             {/* Aggiungi altre route quando crei nuove pagine */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>

@@ -4,7 +4,7 @@ const User = require('../models/Users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const authenticateJWT = require('../middleware/authMiddleware');
+const { authMiddleware, loginLimiter } = require('../middleware/authMiddleware');
 
 const secretKey = process.env.JWT_SECRET;
 
@@ -67,7 +67,8 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+// Aggiungi il loginLimiter come middleware alla route login
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     

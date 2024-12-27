@@ -1,5 +1,5 @@
 {
-  "proxy": "http://localhost:5000",
+  "proxy": "http://server:5000",
   "name": "client",
   "version": "1.0.0",
   "dependencies": {
