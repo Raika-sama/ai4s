@@ -1,37 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/card";
 import { School, Users, GraduationCap, ClipboardList } from 'lucide-react';
+import axios from 'axios';
 
-function SchoolPage() {
+const SchoolPage = () => {
   const [school, setSchool] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSchoolData = async () => {
+    const fetchSchool = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('/api/schools/assigned', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSchool(data.data);
+        const response = await axios.get('http://localhost:5000/api/schools/assigned');
+        
+        if (response.data.success) {
+          setSchool(response.data.data);
         } else {
-          const errorData = await response.json();
-          setError(errorData.message);
+          setError(response.data.message);
         }
-      } catch (error) {
-        setError('Errore nel recupero dei dati della scuola');
+      } catch (err) {
+        setError('Errore nel caricamento della scuola');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSchoolData();
+    fetchSchool();
   }, []);
 
   if (loading) {

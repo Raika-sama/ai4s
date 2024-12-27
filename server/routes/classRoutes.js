@@ -4,25 +4,88 @@ const Class = require('../models/Class');
 const { authMiddleware } = require('../middleware/authMiddleware');
 const classController = require('../controllers/classController');
 
-// GET /api/classes - Ottieni tutte le classi della scuola
+
+// Debug route
+router.get('/test', (req, res) => {
+    res.json({ message: "Class route working" });
+});
+
 router.get('/', authMiddleware, async (req, res) => {
     try {
-        const classes = await Class.find({ scuola: req.user.school })
-            .populate('docenti', 'nome cognome email')
-            .populate('studenti', 'nome cognome email')
-            .populate('createdBy', 'nome cognome')
-            .sort({ nome: 1, sezione: 1 });
+        console.log('1. Route /api/classes chiamata');
+        console.log('2. User autenticato:', req.user);
+        
+        // Verifica che il modello sia disponibile
+        console.log('3. Class model:', typeof Class);
+        
+        // Query di test
+        console.log('4. Tentativo query find');
+        const count = await Class.countDocuments();
+        console.log('5. Numero di classi nel database:', count);
+        
+        const classes = await Class.find({})
+            .lean()  // per performance
+            .exec();
+            
+        console.log('6. Query completata, classi trovate:', classes.length);
 
         res.json({
             success: true,
             data: classes
         });
     } catch (error) {
-        console.error('Errore nel recupero delle classi:', error);
+        console.error('ERRORE DETTAGLIATO:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            name: error.name
+        });
+
         res.status(500).json({
             success: false,
             message: 'Errore nel recupero delle classi',
-            error: error.message
+            debug: {
+                errorMessage: error.message,
+                errorName: error.name
+            }
+        });
+    }
+});
+
+
+// GET /api/classes - Ottieni tutte le classi
+router.get('/', authMiddleware, async (req, res) => {
+    try {
+        // Log per debug
+        console.log('Inizio recupero classi');
+        
+        // Verifica che il modello sia caricato correttamente
+        console.log('Model Class:', Class);
+        
+        // Prova una query semplice prima
+        const classes = await Class.find({});
+        
+        console.log('Classi trovate:', classes);
+
+        res.json({
+            success: true,
+            data: classes
+        });
+    } catch (error) {
+        // Log dettagliato dell'errore
+        console.error('Errore completo:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
+
+        res.status(500).json({
+            success: false,
+            message: 'Errore nel recupero delle classi',
+            error: {
+                message: error.message,
+                type: error.name
+            }
         });
     }
 });

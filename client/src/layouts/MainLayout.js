@@ -1,35 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Menu, User, LogOut, Settings } from 'lucide-react';
+import axios from 'axios'; // Aggiungi questo import
 import Sidebar from '../components/Sidebar';
 import Dashboard from '../pages/Dashboard';
 import SchoolPage from '../pages/SchoolPage';
+import Classes from '../pages/Classes'; // Aggiungi questo import
 
 const MainLayout = () => {
-  const navigate = useNavigate(); // Hook correttamente importato
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Aggiungi la configurazione degli interceptor
+  useEffect(() => {
+    // Configura axios per includere automaticamente il token in tutte le richieste
+    axios.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    // Gestisci automaticamente gli errori di autenticazione
+    axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('userData');
+          navigate('/login');
+        }
+        return Promise.reject(error);
+      }
+    );
+  }, [navigate]);
+
   useEffect(() => {
     const verifyAuth = async () => {
-      const token = localStorage.getItem('token');
-      
       try {
-        const response = await fetch('http://localhost:5000/api/users/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data.user || data);
-        } else {
-          throw new Error('Token validation failed');
-        }
+        // Usa axios invece di fetch
+        const response = await axios.get('http://localhost:5000/api/users/me');
+        setUserData(response.data.user || response.data);
       } catch (error) {
         console.error('Auth verification failed:', error);
         localStorage.removeItem('token');
@@ -52,6 +72,7 @@ const MainLayout = () => {
   if (isLoading) {
     return <div>Caricamento...</div>;
   }
+
 
   return (
     <div className="min-h-screen h-screen flex flex-col">
@@ -109,12 +130,7 @@ const MainLayout = () => {
         {/* Main Content Area */}
         <main className={`flex-1 transition-all duration-300 bg-gray-50
           ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
-          <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/schools" element={<SchoolPage />} />  {/* Aggiungi questa linea */}
-            {/* Aggiungi altre route quando crei nuove pagine */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+          <Outlet />
         </main>
       </div>
     </div>
