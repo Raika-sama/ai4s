@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { authMiddleware, loginLimiter } = require('../middleware/authMiddleware');
-
+const mongoose = require('mongoose');
 const secretKey = process.env.JWT_SECRET;
 
 if(!secretKey){
@@ -68,30 +68,23 @@ router.post('/register', async (req, res) => {
 });
 
 // Aggiungi il loginLimiter come middleware alla route login
-router.post('/login', loginLimiter, async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('Login attempt:', {email, mongoConnection: mongoose.connection.readyState});
     
-    // Log della richiesta (senza password)
-    console.log('Tentativo di login per email:', email);
-
     const user = await User.findOne({ email });
+    console.log('User found:', !!user);
     
     if (!user) {
-      console.log('Utente non trovato:', email);
-      return res.status(401).json({ 
-        success: false,
-        message: 'Credenziali non valide.' 
-      });
+      return res.status(401).json({ success: false, message: 'Credenziali non valide' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match:', isMatch);
+    
     if (!isMatch) {
-      console.log('Password non valida per utente:', email);
-      return res.status(401).json({ 
-        success: false,
-        message: 'Credenziali non valide.' 
-      });
+      return res.status(401).json({ success: false, message: 'Credenziali non valide' });
     }
 
     const token = jwt.sign(
@@ -113,21 +106,18 @@ router.post('/login', loginLimiter, async (req, res) => {
       message: 'Login effettuato con successo!',
       token,
       user: {
+        id: user._id,
         nome: user.nome,
         cognome: user.cognome,
         email: user.email,
         ruolo: user.ruolo
       }
     });
+
   } catch (error) {
     console.error('Errore durante il login:', error);
-    return res.status(500).json({ 
-      success: false,
-      message: 'Errore durante il login.' 
-    });
+    res.status(500).json({ success: false, message: 'Errore durante il login' });
   }
 });
-
-
 
 module.exports = router;

@@ -1,17 +1,17 @@
 version: '3.8'
 
 services:
-  client:
-    build: 
-      context: ./client
+  mongodb:
+    image: mongo:latest
     ports:
-      - "3000:80"
-    environment:
-      - REACT_APP_API_URL=http://localhost:5000  # Modifica qui
-      - REACT_APP_AUTH_HEADER=Authorization
-      - REACT_APP_TOKEN_PREFIX=Bearer
-    depends_on:
-      - server
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: mongosh --eval "db.adminCommand('ping')"
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - app-network
 
@@ -26,25 +26,44 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=24h
       - TOKEN_PREFIX=Bearer
-      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_URI=mongodb://mongodb:27017/ai4s
     depends_on:
-      - stili-cognitivi
+      mongodb:
+        condition: service_healthy
+    command: sh -c "wget -qO /wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && chmod +x /wait-for-it.sh && /wait-for-it.sh mongodb:27017 -- node app.js"
+    networks:
+      - app-network
+
+  client:
+    build: 
+      context: ./client
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_AUTH_HEADER=Authorization
+      - REACT_APP_TOKEN_PREFIX=Bearer
+    depends_on:
+      - server
     networks:
       - app-network
 
   stili-cognitivi:
     build:
-      context: .
-      dockerfile: engines/stili_cognitivi/Dockerfile
+      context: ./engines/stili_cognitivi
     ports:
       - "5001:5001"
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_ALGORITHM=HS256
       - TOKEN_PREFIX=Bearer
+      - FLASK_ENV=dev
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mongodb_data:
