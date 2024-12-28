@@ -21,12 +21,7 @@ app.use(morgan('combined'));
 app.use(express.json());
 
 // Connessione al database
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => console.log('Connesso al database MongoDB'))
-  .catch(err => console.error('Errore di connessione al database:', err));
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connesso al database MongoDB'))
   .catch(err => console.error('Errore di connessione al database:', err));
 

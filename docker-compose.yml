@@ -1,4 +1,4 @@
-version: '3.8'
+name: ai4s
 
 services:
   mongodb:
@@ -20,17 +20,15 @@ services:
       context: ./server
     ports:
       - "5000:5000"
+    container_name: ai4s_server_1
     environment:
       - CORS_ORIGIN=http://localhost:3000
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=24h
       - TOKEN_PREFIX=Bearer
-      - MONGODB_URI=mongodb://mongodb:27017/ai4s
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    command: sh -c "wget -qO /wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && chmod +x /wait-for-it.sh && /wait-for-it.sh mongodb:27017 -- node app.js"
+      - MONGODB_URI=${MONGODB_URI}
+      - PORT=5000
     networks:
       - app-network
 
@@ -40,7 +38,7 @@ services:
     ports:
       - "3000:80"
     environment:
-      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_API_URL=http://ai4s_server_1:5000
       - REACT_APP_AUTH_HEADER=Authorization
       - REACT_APP_TOKEN_PREFIX=Bearer
     depends_on:
@@ -48,9 +46,10 @@ services:
     networks:
       - app-network
 
-  stili-cognitivi:
+  stilicognitivi:    # Nome semplificato del servizio
     build:
-      context: ./engines/stili_cognitivi
+      context: ./engines
+      dockerfile: stili_cognitivi/Dockerfile
     ports:
       - "5001:5001"
     environment:
