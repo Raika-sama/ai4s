@@ -3,15 +3,13 @@ FROM node:18 as build
 
 WORKDIR /app
 
-# Aggiungi variabili ambiente per l'autenticazione
-ENV REACT_APP_API_URL=http://localhost:5000
-ENV REACT_APP_AUTH_HEADER=Authorization
-ENV REACT_APP_TOKEN_PREFIX=Bearer
+
 
 COPY package*.json ./
 # Installa esplicitamente le dipendenze di Material-UI
-RUN npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
+
 RUN npm install
+
 COPY . .
 RUN npm run build
 

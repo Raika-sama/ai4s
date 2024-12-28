@@ -14,7 +14,7 @@ COPY package*.json ./
 RUN npm install
 
 # Rebuild bcrypt to ensure compatibility with alpine
-RUN npm rebuild bcrypt --build-from-source
+RUN npm cache clean --force && npm rebuild bcrypt --build-from-source
 
 COPY . .
 

@@ -15,35 +15,35 @@ function Login() {
     setIsLoading(true);
 
     try {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-        const data = await response.json();
-        
-            if (response.ok && (data.success || data.token)) {
-                localStorage.setItem('token', data.token);
-                if (data.user) {
-                    localStorage.setItem('userData', JSON.stringify(data.user));
-                }
-                if (rememberMe) {
-                    localStorage.setItem('rememberMe', 'true');
-                }
-                navigate('/dashboard');
-            } else {
-                setError(data.message || 'Errore durante il login');
-            }
-          } catch (error) {
-              console.error('Errore di rete:', error);
-              setError('Errore di connessione al server');
-          } finally {
-              setIsLoading(false);
-          }
-      };
+      const data = await response.json();
+      
+      if (response.ok && (data.success || data.token)) {
+        localStorage.setItem('token', data.token);
+        if (data.user) {
+          localStorage.setItem('userData', JSON.stringify(data.user));
+        }
+        if (rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
+        navigate('/dashboard');
+      } else {
+        setError(data.message || 'Errore durante il login');
+      }
+    } catch (error) {
+      console.error('Errore di rete:', error);
+      setError('Errore di connessione al server');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Il resto del componente rimane invariato
   return (
