@@ -1,20 +1,19 @@
-FROM node:18-alpine
+FROM node:18
 
 ENV JWT_SECRET=""
 ENV JWT_EXPIRES_IN=24h
 ENV TOKEN_PREFIX=Bearer
 
-# Install the exact packages needed for bcrypt compilation
-RUN apk add --no-cache python3 make gcc g++ libc-dev linux-headers
 
 WORKDIR /app
+
+
+
 
 COPY package*.json ./
 
 RUN npm install
 
-# Rebuild bcrypt to ensure compatibility with alpine
-RUN npm cache clean --force && npm rebuild bcrypt --build-from-source
 
 COPY . .
 

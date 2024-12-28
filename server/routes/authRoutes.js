@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/Users');
-const bcrypt = require('bcrypt');
+
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { authMiddleware, loginLimiter } = require('../middleware/authMiddleware');
@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
     const newUser = new User({ 
       nome, 
       cognome, 
@@ -80,7 +80,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Credenziali non valide' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await verifyPassword(user.password, password);
     console.log('Password match:', isMatch);
     
     if (!isMatch) {
