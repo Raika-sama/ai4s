@@ -15,7 +15,13 @@ const classRoutes = require('./routes/classRoutes');  // Aggiungiamo questa line
 const app = express();
 
 // Middleware di base
-app.use(cors());
+const corsOptions = {
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(morgan('combined'));
 app.use(express.json());

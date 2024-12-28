@@ -15,52 +15,35 @@ function Login() {
     setIsLoading(true);
 
     try {
-      console.log('Tentativo di login con:', { email });
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
 
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-      console.log('Risposta dal server:', data);
-      
-      // Verifica se il login è riuscito (controlla sia il nuovo che il vecchio formato)
-      if (response.ok && (data.success || data.token)) {
-        console.log('Login riuscito, token ricevuto');
-        // Salva il token
-        localStorage.setItem('token', data.token);
+        const data = await response.json();
         
-        // Se abbiamo i dati utente, salvali
-        if (data.user) {
-          localStorage.setItem('userData', JSON.stringify(data.user));
-        }
-        
-        // Gestisci "Ricordami"
-        if (rememberMe) {
-          localStorage.setItem('rememberMe', 'true');
-        } else {
-          localStorage.removeItem('rememberMe');
-        }
-        
-        // Reindirizza alla dashboard
-        navigate('/dashboard');
-      } else {
-        // Gestisci l'errore
-        const errorMessage = data.message || 'Errore durante il login. Verifica le tue credenziali.';
-        console.log('Errore login:', errorMessage);
-        setError(errorMessage);
-      }
-    } catch (error) {
-      console.error('Errore di rete:', error);
-      setError('Errore di connessione al server. Riprova più tardi.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+            if (response.ok && (data.success || data.token)) {
+                localStorage.setItem('token', data.token);
+                if (data.user) {
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+                }
+                if (rememberMe) {
+                    localStorage.setItem('rememberMe', 'true');
+                }
+                navigate('/dashboard');
+            } else {
+                setError(data.message || 'Errore durante il login');
+            }
+          } catch (error) {
+              console.error('Errore di rete:', error);
+              setError('Errore di connessione al server');
+          } finally {
+              setIsLoading(false);
+          }
+      };
 
   // Il resto del componente rimane invariato
   return (
