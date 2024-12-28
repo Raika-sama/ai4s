@@ -1,19 +1,40 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/Users');
-
+const util = require('util');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { authMiddleware, loginLimiter } = require('../middleware/authMiddleware');
 const mongoose = require('mongoose');
+
 const secretKey = process.env.JWT_SECRET;
 
 if(!secretKey){
     throw new Error("JWT_SECRET environment variable not defined.");
 }
 
+// Promisify scrypt e randomBytes
+const scrypt = util.promisify(crypto.scrypt);
+const randomBytes = util.promisify(crypto.randomBytes);
+
+// Aggiungi queste funzioni di utility per l'hashing
+async function hashPassword(password) {
+    const salt = (await randomBytes(16)).toString('hex');
+    const derivedKey = await scrypt(password, salt, 64);
+    return `${salt}.${derivedKey.toString('hex')}`;
+}
+
+async function verifyPassword(storedPassword, suppliedPassword) {
+    const [salt, hash] = storedPassword.split('.');
+    const hashedBuffer = await scrypt(suppliedPassword, salt, 64);
+    const keyBuffer = Buffer.from(hash, 'hex');
+    const hashBuffer = Buffer.from(hashedBuffer);
+    return crypto.timingSafeEqual(hashBuffer, keyBuffer);
+}
+
 router.post('/register', async (req, res) => {
   try {
+    console.log('Ricevuta richiesta di registrazione:', req.body);
     const { nome, cognome, email, password, ruolo } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -25,6 +46,7 @@ router.post('/register', async (req, res) => {
     }
 
     const hashedPassword = await hashPassword(password);
+    console.log('Password hashata con successo');
     const newUser = new User({ 
       nome, 
       cognome, 
@@ -34,7 +56,8 @@ router.post('/register', async (req, res) => {
     });
 
     await newUser.save();
-    
+    console.log('Nuovo utente creato con successo:', email);
+
     const token = jwt.sign(
       { 
         userId: newUser._id,
@@ -69,6 +92,7 @@ router.post('/register', async (req, res) => {
 
 // Aggiungi il loginLimiter come middleware alla route login
 router.post('/login', async (req, res) => {
+  console.log('Login route hit - body:', req.body);
   try {
     const { email, password } = req.body;
     console.log('Login attempt:', {email, mongoConnection: mongoose.connection.readyState});

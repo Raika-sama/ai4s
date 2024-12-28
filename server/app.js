@@ -31,6 +31,12 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connesso al database MongoDB'))
   .catch(err => console.error('Errore di connessione al database:', err));
 
+// Middleware di logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
