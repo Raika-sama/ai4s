@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Menu, User, LogOut, Settings } from 'lucide-react';
-import axios from 'axios'; // Aggiungi questo import
+import axios from 'axios';
 import Sidebar from '../components/Sidebar';
-
 
 const MainLayout = () => {
   const navigate = useNavigate();
@@ -12,9 +11,8 @@ const MainLayout = () => {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Aggiungi la configurazione degli interceptor
+  // Manteniamo tutti gli interceptor e la logica di autenticazione invariati
   useEffect(() => {
-    // Configura axios per includere automaticamente il token in tutte le richieste
     axios.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('token');
@@ -28,7 +26,6 @@ const MainLayout = () => {
       }
     );
 
-    // Gestisci automaticamente gli errori di autenticazione
     axios.interceptors.response.use(
       (response) => response,
       (error) => {
@@ -45,11 +42,11 @@ const MainLayout = () => {
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        const response = await axios.get('/api/users/me'); // Usa URL relativo
-        console.log('Risposta API /users/me:', response.data); // Debug
+        const response = await axios.get('/api/users/me');
+        console.log('Risposta API /users/me:', response.data);
         
         const user = response.data.user || response.data;
-        console.log('Dati utente estratti:', user); // Debug
+        console.log('Dati utente estratti:', user);
         
         if (!user) {
           throw new Error('Nessun dato utente nella risposta');
@@ -69,7 +66,6 @@ const MainLayout = () => {
     verifyAuth();
   }, [navigate]);
 
-  // Aggiungi questo effect per monitorare i cambiamenti di userData
   useEffect(() => {
     console.log('userData aggiornato:', userData);
   }, [userData]);
@@ -84,13 +80,11 @@ const MainLayout = () => {
     return <div>Caricamento...</div>;
   }
 
-
   return (
     <div className="min-h-screen h-screen flex flex-col">
-      {/* Header */}
+      {/* Header - manteniamo la posizione fixed come era prima */}
       <header className="h-16 bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
         <div className="h-full px-4 flex items-center justify-between">
-          {/* Left side */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -100,7 +94,7 @@ const MainLayout = () => {
             </button>
             <span className="text-xl font-semibold">Test Platform</span>
           </div>
-  
+
           {/* User menu */}
           <div className="relative">
             <button
@@ -117,7 +111,7 @@ const MainLayout = () => {
                 </div>
               )}
             </button>
-  
+
             {isUserMenuOpen && userData && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 border border-gray-200">
                 <button
@@ -132,13 +126,20 @@ const MainLayout = () => {
           </div>
         </div>
       </header>
-  
-      {/* Main Container */}
+
+      {/* Main Container - adattato per lavorare con il Sidebar esistente */}
       <div className="flex flex-1 pt-16">
+        {/* Sidebar - usando il componente esistente */}
         <Sidebar isOpen={isSidebarOpen} />
-        <main className={`flex-1 transition-all duration-300 bg-gray-50
-          ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
-          <Outlet />
+        
+        {/* Main Content - adattato per funzionare con il Sidebar */}
+        <main 
+          className={`flex-1 overflow-auto transition-all duration-300 bg-gray-50
+            ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}
+        >
+          <div className="h-full p-6">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

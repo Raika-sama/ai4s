@@ -4,12 +4,12 @@ const Class = require('../models/Class');
 const { authMiddleware } = require('../middleware/authMiddleware');
 const classController = require('../controllers/classController');
 
-
 // Debug route
 router.get('/test', (req, res) => {
     res.json({ message: "Class route working" });
 });
 
+// GET /api/classes - Ottieni tutte le classi
 router.get('/', authMiddleware, async (req, res) => {
     try {
         console.log('1. Route /api/classes chiamata');
@@ -18,13 +18,12 @@ router.get('/', authMiddleware, async (req, res) => {
         // Verifica che il modello sia disponibile
         console.log('3. Class model:', typeof Class);
         
-        // Query di test
-        console.log('4. Tentativo query find');
-        const count = await Class.countDocuments();
-        console.log('5. Numero di classi nel database:', count);
-        
-        const classes = await Class.find({})
-            .lean()  // per performance
+        // Query per ottenere le classi della scuola dell'utente autenticato
+        const classes = await Class.find({ scuola: req.user.school })
+            .populate('docenti', 'nome cognome email')
+            .populate('studenti', 'nome cognome email')
+            .populate('createdBy', 'nome cognome')
+            .lean()
             .exec();
             
         console.log('6. Query completata, classi trovate:', classes.length);
@@ -47,44 +46,6 @@ router.get('/', authMiddleware, async (req, res) => {
             debug: {
                 errorMessage: error.message,
                 errorName: error.name
-            }
-        });
-    }
-});
-
-
-// GET /api/classes - Ottieni tutte le classi
-router.get('/', authMiddleware, async (req, res) => {
-    try {
-        // Log per debug
-        console.log('Inizio recupero classi');
-        
-        // Verifica che il modello sia caricato correttamente
-        console.log('Model Class:', Class);
-        
-        // Prova una query semplice prima
-        const classes = await Class.find({});
-        
-        console.log('Classi trovate:', classes);
-
-        res.json({
-            success: true,
-            data: classes
-        });
-    } catch (error) {
-        // Log dettagliato dell'errore
-        console.error('Errore completo:', {
-            message: error.message,
-            stack: error.stack,
-            name: error.name
-        });
-
-        res.status(500).json({
-            success: false,
-            message: 'Errore nel recupero delle classi',
-            error: {
-                message: error.message,
-                type: error.name
             }
         });
     }
@@ -322,11 +283,5 @@ router.delete('/:id/students/:studentId', authMiddleware, async (req, res) => {
         });
     }
 });
-
-router.get('/', classController.getClasses);
-router.post('/', classController.createClass);
-router.get('/:id', classController.getClass);
-router.put('/:id', classController.updateClass);
-router.delete('/:id', classController.deleteClass);
 
 module.exports = router;
