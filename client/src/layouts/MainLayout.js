@@ -45,9 +45,17 @@ const MainLayout = () => {
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        // Usa axios invece di fetch
-        const response = await axios.get('/api/schools/assigned');
-        setUserData(response.data.user || response.data);
+        const response = await axios.get('/api/users/me'); // Usa URL relativo
+        console.log('Risposta API /users/me:', response.data); // Debug
+        
+        const user = response.data.user || response.data;
+        console.log('Dati utente estratti:', user); // Debug
+        
+        if (!user) {
+          throw new Error('Nessun dato utente nella risposta');
+        }
+        
+        setUserData(user);
       } catch (error) {
         console.error('Auth verification failed:', error);
         localStorage.removeItem('token');
@@ -60,6 +68,11 @@ const MainLayout = () => {
 
     verifyAuth();
   }, [navigate]);
+
+  // Aggiungi questo effect per monitorare i cambiamenti di userData
+  useEffect(() => {
+    console.log('userData aggiornato:', userData);
+  }, [userData]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -105,7 +118,7 @@ const MainLayout = () => {
               )}
             </button>
   
-            {isUserMenuOpen && (
+            {isUserMenuOpen && userData && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 border border-gray-200">
                 <button
                   onClick={handleLogout}
