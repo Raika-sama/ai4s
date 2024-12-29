@@ -21,35 +21,7 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 });
 
-// Special route for assigned schools
-router.get('/assigned', authMiddleware, async (req, res) => {
-    try {
-        console.log('Searching for school with userId:', req.user.userId); // Debug log
 
-        const school = await School.findOne({
-            users: req.user.userId
-        });
-        
-        if (!school) {
-            return res.status(200).json({ // Changed to 200 since this is a valid case
-                success: true,
-                data: null,
-                message: 'Nessuna scuola assegnata a questo utente'
-            });
-        }
-
-        res.json({
-            success: true,
-            data: school
-        });
-    } catch (error) {
-        console.error('Errore nel recupero della scuola:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Errore nel recupero della scuola'
-        });
-    }
-});
 
 // GET /api/schools/:id - Ottieni una scuola specifica
 router.get('/:id', authMiddleware, async (req, res) => {
