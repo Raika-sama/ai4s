@@ -54,6 +54,11 @@ mongoose.connect(process.env.MONGODB_URI, {
   process.exit(1);  // Termina l'applicazione se non riesce a connettersi al database
 });
 
+// Aggiungi anche questi listener per gestire gli eventi di connessione
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connesso');
+});
+
 // Gestione eventi di connessione MongoDB
 mongoose.connection.on('error', err => {
   console.error('Errore MongoDB:', err);

@@ -44,7 +44,6 @@ function Login() {
     }
   };
 
-  // Il resto del componente rimane invariato
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow">
       <h2 className="text-2xl font-bold mb-6">Login</h2>
