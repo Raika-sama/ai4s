@@ -46,7 +46,7 @@ const MainLayout = () => {
     const verifyAuth = async () => {
       try {
         // Usa axios invece di fetch
-        const response = await axios.get('http://localhost:5000/api/users/me');
+        const response = await axios.get('/api/schools/assigned');
         setUserData(response.data.user || response.data);
       } catch (error) {
         console.error('Auth verification failed:', error);

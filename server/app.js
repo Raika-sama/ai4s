@@ -1,10 +1,19 @@
+const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
-const path = require('path');
+// All'inizio del file, dopo require('dotenv').config()
+const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET', 'PORT'];
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+if (missingEnvVars.length > 0) {
+  console.error('Variabili d\'ambiente mancanti:', missingEnvVars.join(', '));
+  process.exit(1);
+}
+
+
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -27,9 +36,39 @@ app.use(morgan('combined'));
 app.use(express.json());
 
 // Connessione al database
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connesso al database MongoDB'))
-  .catch(err => console.error('Errore di connessione al database:', err));
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  dbName: 'ai4sDB'  // Specifica esplicitamente il nome del database
+})
+.then(() => {
+  console.log('Connesso al database MongoDB');
+  // Stampa il nome del database a cui sei connesso
+  console.log('Database name:', mongoose.connection.name);
+  // Stampa l'URI di connessione (nascondi la password per sicurezza)
+  const sanitizedUri = process.env.MONGODB_URI.replace(/:([^@]+)@/, ':****@');
+  console.log('MongoDB URI:', sanitizedUri);
+})
+.catch(err => {
+  console.error('Errore di connessione al database:', err);
+  process.exit(1);  // Termina l'applicazione se non riesce a connettersi al database
+});
+
+// Gestione eventi di connessione MongoDB
+mongoose.connection.on('error', err => {
+  console.error('Errore MongoDB:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnesso');
+});
+
+process.on('SIGINT', () => {
+  mongoose.connection.close(() => {
+    console.log('MongoDB disconnesso per termine applicazione');
+    process.exit(0);
+  });
+});
 
 // Middleware di logging
 app.use((req, res, next) => {

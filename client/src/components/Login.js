@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL, API_HEADERS } from '../config';  // Aggiungi questa riga all'inizio
 
 function Login() {
   const navigate = useNavigate();
@@ -17,9 +18,7 @@ function Login() {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
+        headers: API_HEADERS,
         body: JSON.stringify({ email, password })
       });
 

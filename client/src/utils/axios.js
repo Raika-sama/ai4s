@@ -1,8 +1,12 @@
 import axios from 'axios';
+import { API_URL } from '../config';
 
-const axiosInstance = axios.create();
+const instance = axios.create({
+  baseURL: API_URL
+});
 
-axiosInstance.interceptors.request.use(
+// Configurazione interceptors
+instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -10,22 +14,19 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor per gestire le risposte
-axiosInstance.interceptors.response.use(
+instance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token non valido o scaduto
       localStorage.removeItem('token');
+      localStorage.removeItem('userData');
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance;
+export default instance;
