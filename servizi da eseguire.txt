@@ -37,3 +37,5 @@ Backend (Node.js)
 
 
 PER AVVIARE AMBIENTE VIRTUALE: source venv/Scripts/activate
+
+PEr avviare mongosh mongosh "mongodb+srv://ai4sdb.7leax.mongodb.net/ai4sDB"

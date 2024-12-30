@@ -75,6 +75,5 @@ schoolSchema.pre('save', function(next) {
     next();
 });
 
-const School = mongoose.model('School', schoolSchema);
+module.exports = mongoose.model('School', schoolSchema);
 
-module.exports = School;

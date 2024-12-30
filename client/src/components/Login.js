@@ -16,6 +16,7 @@ function Login() {
     setIsLoading(true);
 
     try {
+      console.log('Attempting login with:', { email, password }); // log per debug
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: API_HEADERS,

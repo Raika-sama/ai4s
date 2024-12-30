@@ -6,18 +6,10 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
-// Verifica variabili d'ambiente
-const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET', 'PORT'];
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
-if (missingEnvVars.length > 0) {
-  console.error('Variabili d\'ambiente mancanti:', missingEnvVars.join(', '));
-  process.exit(1);
-}
-
-// Create Express app
+// 2. Create Express app
 const app = express();
 
-// Middleware di base
+// Middleware di base DEVE STARE ALL'INIZIO
 const corsOptions = {
   origin: ['http://localhost:3000', 'http://localhost:3001'],
   credentials: true,
@@ -34,29 +26,62 @@ app.use(express.json());
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    dbName: 'ai4sDB'
-})
-.then(() => {
+    dbName: 'ai4sDB'  // Specifica esplicitamente il nome del database
+  })
+  .then(() => {
     console.log('Connesso al database MongoDB');
+    // Stampa il nome del database a cui sei connesso
     console.log('Database name:', mongoose.connection.name);
+    // Stampa l'URI di connessione (nascondi la password per sicurezza)
     const sanitizedUri = process.env.MONGODB_URI.replace(/:([^@]+)@/, ':****@');
     console.log('MongoDB URI:', sanitizedUri);
-})
-.catch(err => {
+  })
+  .catch(err => {
     console.error('Errore di connessione al database:', err);
-    process.exit(1);
-});
+    process.exit(1);  // Termina l'applicazione se non riesce a connettersi al database
+  });
 
-// Require models
-require('./models/Schools');
-require('./models/Users');
-require('./models/Class');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const schoolRoutes = require('./routes/schoolRoutes');
-const classRoutes = require('./routes/classRoutes');
+const classRoutes = require('./routes/classRoutes');  // Aggiungiamo questa linea
+
+
+// All'inizio del file, dopo require('dotenv').config()
+const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET', 'PORT'];
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+if (missingEnvVars.length > 0) {
+  console.error('Variabili d\'ambiente mancanti:', missingEnvVars.join(', '));
+  process.exit(1);
+}
+
+// server/app.js
+require('./models/Schools');
+require('./models/Users');
+require('./models/Class');
+
+// Aggiungi anche questi listener per gestire gli eventi di connessione
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connesso');
+});
+
+// Gestione eventi di connessione MongoDB
+mongoose.connection.on('error', err => {
+  console.error('Errore MongoDB:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnesso');
+});
+
+process.on('SIGINT', () => {
+  mongoose.connection.close(() => {
+    console.log('MongoDB disconnesso per termine applicazione');
+    process.exit(0);
+  });
+});
 
 // Middleware di logging
 app.use((req, res, next) => {
@@ -64,11 +89,13 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/classes', classRoutes);
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/schools', schoolRoutes);
-app.use('/api/classes', classRoutes);  // Solo una volta
+app.use('/api/classes', classRoutes);  // Aggiungiamo questa linea
 
 // Gestione degli errori
 app.use((err, req, res, next) => {
@@ -80,7 +107,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Production static files
+// Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
   

@@ -1,83 +1,39 @@
-// ClassCard.js
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  IconButton,
-  useTheme,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Card, CardContent, Typography, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const ClassCard = ({ classe, expanded, onExpandClick }) => {
-  const theme = useTheme();
+const ClassCard = ({ classe }) => {
+  const navigate = useNavigate();
 
   return (
-    <Card
-      onClick={onExpandClick}
-      sx={{
-        position: 'relative',
-        transition: 'all 0.3s ease',
+    <Card 
+      sx={{ 
+        height: '100%',
         cursor: 'pointer',
-        height: expanded ? '100%' : 'auto',
-        width: expanded ? '100%' : '300px', // larghezza fissa per card non espanse
-        transform: expanded ? 'scale(1)' : 'scale(0.95)',
+        transition: 'transform 0.2s, box-shadow 0.2s',
         '&:hover': {
-          transform: expanded ? 'scale(1)' : 'scale(0.98)',
-          boxShadow: theme.shadows[8],
-        },
-        backgroundColor: theme.palette.background.paper,
-        borderRadius: '12px',
-        overflow: 'hidden',
+          transform: 'translateY(-4px)',
+          boxShadow: 4,
+        }
       }}
+      onClick={() => navigate(`/classes/${classe._id}`)}
     >
-      {/* Contenuto base della card (sempre visibile) */}
       <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h5" component="h2">
-            {classe.nome} {classe.sezione}
-          </Typography>
-          <IconButton
-            sx={{
-              transform: expanded ? 'rotate(180deg)' : 'rotate(0)',
-              transition: 'transform 0.3s ease',
-            }}
-          >
-            <ExpandMoreIcon />
-          </IconButton>
-        </Box>
+        <Typography variant="h5" component="h2" gutterBottom>
+          {classe.nome}
+        </Typography>
         <Typography color="textSecondary" gutterBottom>
-          Anno Scolastico: {classe.annoScolastico}
+          Anno Scolastico: {classe.anno}
         </Typography>
-        <Typography>
-          Studenti: {classe.studenti?.length || 0}
+        <Typography color="textSecondary" gutterBottom>
+          Indirizzo: {classe.indirizzo}
         </Typography>
-      </CardContent>
-
-      {/* Contenuto espanso */}
-      {expanded && (
-        <Box
-          sx={{
-            p: 3,
-            mt: 2,
-            borderTop: `1px solid ${theme.palette.divider}`,
-            height: 'calc(100% - 200px)', // altezza dinamica
-            overflow: 'auto',
-          }}
-        >
-          {/* Qui inseriremo il contenuto dettagliato */}
-          <Typography variant="h6" gutterBottom>
-            Dettagli Classe
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body2" color="textSecondary">
+            Docenti: {classe.docenti?.length || 0}
           </Typography>
-          {/* Placeholder per il contenuto futuro */}
-          <Box sx={{ mt: 2 }}>
-            <Typography paragraph>
-              Contenuto dettagliato della classe...
-            </Typography>
-          </Box>
         </Box>
-      )}
+      </CardContent>
     </Card>
   );
 };

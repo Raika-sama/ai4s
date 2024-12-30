@@ -46,7 +46,6 @@ router.post('/register', async (req, res) => {
     }
 
     const hashedPassword = await hashPassword(password);
-    console.log('Password hashata con successo');
     const newUser = new User({ 
       nome, 
       cognome, 
@@ -56,16 +55,15 @@ router.post('/register', async (req, res) => {
     });
 
     await newUser.save();
-    console.log('Nuovo utente creato con successo:', email);
 
     const token = jwt.sign(
       { 
         userId: newUser._id,
         email: newUser.email,
-        ruolo: newUser.ruolo 
+        ruolo: newUser.ruolo
       }, 
-      secretKey,
-      { 
+      process.env.JWT_SECRET, 
+      {
         expiresIn: '24h'
       }
     );
@@ -81,6 +79,7 @@ router.post('/register', async (req, res) => {
         ruolo: newUser.ruolo
       }
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ 
@@ -111,17 +110,14 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Credenziali non valide' });
     }
 
-    const token = jwt.sign(
-      { 
-        userId: user._id,
-        email: user.email,
-        ruolo: user.ruolo 
-      }, 
-      secretKey,
-      { 
-        expiresIn: '24h'
-      }
-    );
+    const token = jwt.sign({
+      userId: user._id,
+      email: user.email,
+      ruolo: user.ruolo,
+      scuola: user.scuola  // Usa 'scuola' invece di 'school'
+  }, process.env.JWT_SECRET, {
+      expiresIn: '24h'
+  });
 
     console.log('Login riuscito per utente:', email);
 
@@ -130,11 +126,12 @@ router.post('/login', async (req, res) => {
       message: 'Login effettuato con successo!',
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         nome: user.nome,
         cognome: user.cognome,
         email: user.email,
-        ruolo: user.ruolo
+        ruolo: user.ruolo,
+        scuola: user.scuola
       }
     });
 
